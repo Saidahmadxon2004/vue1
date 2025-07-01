@@ -1,38 +1,30 @@
 <template>
   <div class="container-fluid mt-3">
     <div class="pb-3 d-flex justify-content-between align-items-center">
-      <h4 class="mb-0 fs-2 text-primary">To'lov</h4>
-      <button class="btn btn-primary btn-md" @click="$router.push('/addTolov')">Qo'shish</button>
+      <h4 class="mb-0 fs-2 text-primary">Foydalanuvchilar</h4>
+      <button class="btn btn-primary btn-md" @click="$router.push('/user/create')">Qo'shish</button>
     </div>
 
     <div class="table-wrapper rounded shadow-sm">
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Ism</th>
-            <th>Sana & Vaqt</th>
+            <th>No</th>
+            <th>Nomi</th>
             <th>Sklad</th>
-            <th>Turi</th>
-            <th>Kontragent</th>
-            <th>Izoh</th>
             <th>Amallar</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in tolovlar" :key="index">
-            <td>{{ item.id }}</td>
-            <td>{{ item.user?.first_name }}</td>
-            <td>{{ item.datetime }}</td>
+          <tr v-for="(item, index) in data" :key="index">
+            <td>{{ index + 1 }}</td>
+            <td>{{ item.username }}</td>
             <td>{{ item.sklad?.name }}</td>
-            <td>{{ item.pay_type?.name }}</td>
-            <td>{{ item.kontragent?.name }}</td>
-            <td>{{ item.comment }}</td>
             <td>
-              <button class="btn btn-sm btn-warning me-1">
+              <button class="btn btn-sm btn-warning me-1" @click="$router.push('/user/update/' + item.id)">
                 <i class="bi bi-pencil-square"></i>
               </button>
-              <button class="btn btn-sm btn-danger" @click="deleteElement(index)">
+              <button class="btn btn-sm btn-danger" @click="deleteElement(item.id)">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -47,36 +39,34 @@
 export default {
   data() {
     return {
-      tolovlar: [],
+      data: [],
     };
   },
+
   async mounted() {
     try {
-      const res = await this.$axios.get('/api/v1/kontragent-pay');
+      const res = await this.$axios.get('/api/v1/users');
       console.log(res);
-      this.tolovlar = res.data;
+      this.data = res.data;
       console.log(res.data);
-      console.log('✅ Tolovlar yuklandi:', this.tolovlar);
+      console.log('✅ Foydalanuvchilar yuklandi:', this.data);
     } catch (err) {
-      console.error('❌ Tolovlarni yuklashda xatolik:', err);
+      console.error('❌ Foydalanuvchilarni yuklashda xatolik:', err);
     }
   },
-  methods: {
-    async deleteElement(index) {
-      const id = this.tolovlar[index].id;
-      const confirmDelete = confirm(`Rostdan ham ID: ${id} bo‘lgan to‘lovni o‘chirasizmi?`);
-      if (!confirmDelete) return;
 
+  methods: {
+    async deleteElement(id) {
       try {
-        await this.$axios.delete(`/api/v1/kontragent-pay/id/${id}`);
-        this.tolovlar.splice(index, 1);
-        alert(`🗑️ ID: ${id} to‘lov muvaffaqiyatli o‘chirildi`);
+        await this.$axios.delete(`/api/v1/users/id/${id}`);
+        alert(`🗑️ ID: ${id} foydalanuvchi muvaffaqiyatli o‘chirildi`);
+        window.location.reload();
       } catch (err) {
         console.error('❌ O‘chirishda xatolik:', err);
         alert('Xatolik: o‘chirish bajarilmadi');
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

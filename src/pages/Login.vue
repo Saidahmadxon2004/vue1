@@ -4,6 +4,7 @@
       <h3 class="text-center mb-4">Admin Login</h3>
       <form @submit.prevent="handleLogin">
         
+        <!-- Sklad select -->
         <Vue3Select
           v-model="selectedSklad"
           :options="options"
@@ -12,7 +13,7 @@
           placeholder="Sklad tanlang"
         />
 
-        
+        <!-- Admin select -->
         <Vue3Select
           v-if="selectedSklad"
           v-model="selectedAdmin"
@@ -23,7 +24,7 @@
           class="mt-3"
         />
 
-        
+        <!-- Parol -->
         <div class="mb-3 mt-3">
           <input
             type="password"
@@ -34,10 +35,12 @@
           />
         </div>
 
+        <!-- Xato -->
         <div v-if="showErr" class="alert alert-danger py-2 px-3" role="alert">
           Parol xato yoki admin tanlanmagan
         </div>
 
+        <!-- Button -->
         <button type="submit" class="btn btn-primary w-100">
           Login
         </button>
@@ -61,58 +64,84 @@ export default {
       parol: '',
       showErr: false,
       options: [],
-      admins: [],
+      admins: [{username:"Админ",
+        skladId:1
+      }]
     }
   },
   computed: {
     filteredAdmins() {
-      
+      if (!this.selectedSklad) return []
       return this.admins.filter(admin => admin.skladId === this.selectedSklad)
     }
   },
   mounted() {
     this.loadSkladOptions()
+    this.loadAdmins()
   },
   methods: {
     async loadSkladOptions() {
       try {
-        const res = await axios.get('http://185.76.13.223:3084/api/v1/sklads/skladnames')
-        console.log('Skladlar:', res.data)
-
+        const res = await axios.get('/api/v1/sklads/skladnames')
         this.options = res.data.map((item, index) => ({
           id: index + 1,
           name: item.name
         }))
-
-        
-        this.admins = [
-          { username: 'admin1', parol: '123456', skladId: 1 },
-          { username: 'admin2', parol: '12345', skladId: 1 },
-          { username: 'admin3', parol: '1234', skladId: 2 },
-          { username: 'admin4', parol: '123', skladId: 2 }
-          
-        ]
       } catch (error) {
-        console.error('Xatolik:', error)
+        console.error('Skladlarni olishda xatolik:', error)
       }
     },
-    handleLogin() {
-      const admin = this.admins.find(
-        a => a.username === this.selectedAdmin && a.skladId === this.selectedSklad
-      )
+    async loadAdmins() {
+      try {
+        const res = await axios.get('/api/v1/users')
+        console.log(res.data)
+        this.admins = res.data.map(user => ({
+          username: user.username,
+          skladId: user.sklad_id
+        }))
+      } catch (error) {
+        console.error('Adminlarni olishda xatolik:', error)
+      }
+    },
+    async handleLogin() {
+      if (!this.selectedAdmin || !this.parol || !this.selectedSklad) {
+        this.showErr = true
+        setTimeout(() => (this.showErr = false), 3000)
+        return
+      }
 
-      if (admin && this.parol === admin.parol) {
+      try {
+        const response = await axios.post(
+          '/api/v1/users/login',
+          {
+            username: this.selectedAdmin,
+            password: this.parol,
+            sklad_id: this.selectedSklad
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              mobile: '1'
+            }
+          }
+        )
+        const token = response.data.data.token
+        localStorage.setItem('token', token)
         localStorage.setItem('auth', 'true')
         localStorage.setItem('skladId', this.selectedSklad)
+        localStorage.setItem('username', this.selectedAdmin)
         this.$router.push('/dashboard')
-      } else {
+      } catch (error) {
+        console.error('Login xatoligi:', error)
         this.showErr = true
         this.parol = ''
-        setTimeout(() => {
-          this.showErr = false
-        }, 3000)
+        setTimeout(() => (this.showErr = false), 3000)
       }
     }
   }
 }
 </script>
+
+<style>
+/* xohlasang style qo‘shib bezatsang bo‘ladi */
+</style>

@@ -3,7 +3,7 @@
     <Header />
     <div class="d-flex">
       <Sidebar />
-      <main class="flex-grow-1 p-4 bg-body" style="min-height: 100vh;">
+      <main class="flex-grow-1 p-4 bg-light min-vh-100">
         <router-view />
       </main>
     </div>
