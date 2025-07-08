@@ -1,10 +1,6 @@
 <template>
   <div class="container-fluid mt-3">
-    <div class="pb-3 d-flex justify-content-between align-items-center">
-      <h4 class="mb-0 fs-2 text-primary">Birlik</h4>
-      <button class="btn btn-primary btn-md" @click="$router.push('/addUnit')">Qo'shish</button>
-    </div>
-
+    
     <div class="table-wrapper rounded shadow-sm">
       <table class="table table-bordered">
         <thead>

@@ -144,8 +144,8 @@ export default {
     saveFirma() {
       const method = this.editMode ? 'patch' : 'post';
       const url = this.editMode
-        ? `/api/v1/basa/id/${this.currentFirma.id}`
-        : '/api/v1/basa';
+        ? `/api/v1/base/id/${this.currentFirma.id}`
+        : '/api/v1/base';
 
       this.$axios({ method, url, data: { name: this.currentFirma.name } })
         .then(() => {
@@ -156,15 +156,16 @@ export default {
     },
     deleteFirma(id) {
       if (confirm("Rostan ham o'chirmoqchimisiz?")) {
-        this.$axios.delete(`/api/v1/bas/id/${id}`)
+        this.$axios.delete(`/api/v1/base/id/${id}`)
           .then(() => this.$emit('refresh'))
           .catch(err => console.error('Xato:', err));
       }
     },
     selectFirma(firma) {
-      this.$emit('select', firma.id);
-      this.modal.hide();
-    }
+  console.log("Modal asos tanladi:", firma);
+  this.$emit('select', firma); // obyekt yuboradi
+  this.modal.hide();
+}
   }
 }
 </script>

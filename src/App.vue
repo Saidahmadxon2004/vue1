@@ -19,7 +19,5 @@ body {
   background-color: #f5f5f5;
 }
 
-#app {
-  padding: 20px;
-}
+
 </style>

@@ -1,9 +1,6 @@
 <template>
   <div class="container-fluid mt-3">
-    <div class="pb-3 d-flex justify-content-between align-items-center">
-      <h4 class="mb-0 fs-2 text-primary">To'lov</h4>
-      <button class="btn btn-primary btn-md" @click="$router.push('/addTolov')">Qo'shish</button>
-    </div>
+    
 
     <div class="table-wrapper rounded shadow-sm">
       <table class="table table-bordered">
@@ -29,13 +26,15 @@
             <td>{{ item.kontragent?.name }}</td>
             <td>{{ item.comment }}</td>
             <td>
-              <button class="btn btn-sm btn-warning me-1">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-sm btn-danger" @click="deleteElement(index)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
+  <div class="action-buttons-container">
+    <button class="action-btn btn-edit" @click="$router.push('/tolov/update/' + item.id)">
+      <i class="bi bi-pencil-square"></i>
+    </button>
+    <button class="action-btn btn-delete" @click="deleteElement(item.id)">
+      <i class="bi bi-trash"></i>
+    </button>
+  </div>
+</td>
           </tr>
         </tbody>
       </table>
@@ -62,20 +61,16 @@ export default {
     }
   },
   methods: {
-    async deleteElement(index) {
-      const id = this.tolovlar[index].id;
-      const confirmDelete = confirm(`Rostdan ham ID: ${id} bo‘lgan to‘lovni o‘chirasizmi?`);
-      if (!confirmDelete) return;
-
+    async deleteElement(id) {
       try {
         await this.$axios.delete(`/api/v1/kontragent-pay/id/${id}`);
-        this.tolovlar.splice(index, 1);
-        alert(`🗑️ ID: ${id} to‘lov muvaffaqiyatli o‘chirildi`);
+        alert(`🗑️ ID: ${id} birlik muvaffaqiyatli o‘chirildi`);
+        window.location.reload();
       } catch (err) {
         console.error('❌ O‘chirishda xatolik:', err);
         alert('Xatolik: o‘chirish bajarilmadi');
       }
-    },
+    }
   },
 };
 </script>

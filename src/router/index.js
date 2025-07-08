@@ -5,7 +5,7 @@ import Layout from '../components/Layout.vue'
 import Kirim from '@/pages/Kirim.vue'
 import Chiqim from '@/pages/Chiqim.vue'
 import Tolov from '@/pages/Tolov.vue'
-import addTolov from '@/pages/addTolov.vue'
+
 import Unit from '@/pages/Unit.vue'
 import UnitCreate from '@/Unit/UnitCreate.vue'
 import ExtraUnit from '@/pages/ExtraUnit.vue'
@@ -44,6 +44,10 @@ import UserUpdate from '@/Users/UserUpdate.vue'
 import KassaOrder from '@/pages/KassaOrder.vue'
 import KassaOrderCreate from '@/KassaOrder/KassaOrderCreate.vue'
 import KassaOrderUpdate from '@/KassaOrder/KassaOrderUpdate.vue'
+import KirimCreate from '@/Kirim/KirimCreate.vue'
+import KirimUpdate from '@/Kirim/KirimUpdate.vue'
+import TolovCreate from '@/Tolov/TolovCreate.vue'
+import TolovUpdate from '@/Tolov/TolovUpdate.vue'
 
 
 
@@ -69,8 +73,8 @@ const routes = [
         component: Kirim
 
       },{
-         path: '/chiqim',
-        name: 'Chiqim',
+         path: '/savdo',
+        name: 'Savdo',
         component: Chiqim
 
       },{
@@ -151,8 +155,8 @@ const routes = [
 
       },
       {
-         path: '/kassaOrder',
-        name: 'KassaOrder',
+         path: '/kassoviyOrder',
+        name: 'KassoviyOrder',
         component:KassaOrder
 
       }
@@ -160,7 +164,7 @@ const routes = [
   },{
     path: '/addTolov',
     name: 'AddTolov',
-    component: addTolov
+    component: TolovCreate
   },{
     path: '/addUnit',
     name: 'unitAdd',
@@ -271,7 +275,20 @@ const routes = [
     path: '/kassaOrder/update/:id',
     name: 'KassaOrderUpdate',
     component: KassaOrderUpdate
+  } ,{
+    path: '/kirim/create',
+    name: 'KirimCreate',
+    component:KirimCreate
+  },{
+    path: '/kirim/update/:id',
+    name: 'KirimUpdate',
+    component: KirimUpdate
+  },{
+    path: '/tolov/update/:id',
+    name: 'TolovUpdate',
+    component: TolovUpdate
   }
+
 
 ]
 

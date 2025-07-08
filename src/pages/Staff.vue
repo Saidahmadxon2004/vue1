@@ -1,9 +1,6 @@
 <template>
   <div class="container-fluid mt-3">
-    <div class="pb-3 d-flex justify-content-between align-items-center">
-      <h4 class="mb-0 fs-2 text-primary">Xodimlar</h4>
-      <button class="btn btn-primary btn-md" @click="$router.push('/staff/create')">Qo'shish</button>
-    </div>
+    
 
     <div class="table-wrapper rounded shadow-sm">
       <table class="table table-bordered">
@@ -29,13 +26,15 @@
             <td>{{ item.position }}</td>
             <td>{{ item.tabel_number }}</td>
             <td>
-              <button class="btn btn-sm btn-warning me-1" @click="$router.push('/staff/update/' + item.id)">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-sm btn-danger" @click="deleteElement(item.id)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
+  <div class="action-buttons-container">
+    <button class="action-btn btn-edit" @click="$router.push('/staff/update/' + item.id)">
+      <i class="bi bi-pencil-square"></i>
+    </button>
+    <button class="action-btn btn-delete" @click="deleteElement(item.id)">
+      <i class="bi bi-trash"></i>
+    </button>
+  </div>
+</td>
           </tr>
         </tbody>
       </table>

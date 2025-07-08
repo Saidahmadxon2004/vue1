@@ -1,344 +1,944 @@
 <template>
-  <form class="card p-4 shadow-sm border rounded-3">
-    <h5 class="mb-4">Mahsulot Qo‘shish / Tahrirlash</h5>
-
-    <div class="row mb-3">
-      <div class="col-md-6">
-        <label for="name" class="form-label">Номи (Name)</label>
-        <input
-          type="text"
-          id="name"
-          v-model="datasend.name"
-          class="form-control"
-          placeholder="Mahsulot nomini kiriting..."
-          required
-        />
+  <div class="product-form-container min-h-screen py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="card p-4 shadow-sm border rounded-3 mb-6">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center space-x-3">
+            <div class="w-10 h-10 bg-primary-100 rounded-lg d-flex align-items-center justify-content-center">
+              <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 mb-0">Nomi {{ product.general_name }} (Product qo'shish)</h1>
+              <p class="text-gray-600 text-sm">Mahsulot ma'lumotlarini to'ldiring</p>
+            </div>
+          </div>
+          <div class="d-flex space-x-3">
+            <button type="button" class="btn btn-secondary me-2" @click="handleExit">
+              <i class="bi bi-x-circle me-1"></i> Чиқиш <span class="shortcut">Esc</span>
+            </button>
+            <button type="submit" class="btn btn-primary" @click="saveProduct">
+              <i class="bi bi-save me-1"></i> Сақлаш ва беркитиш <span class="shortcut">Ctrl+Enter</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="col-md-6">
-        <label for="extra_name" class="form-label">Доп. Имя (Extra Name)</label>
-        <input
-          type="text"
-          id="extra_name"
-          v-model="datasend.extra_name"
-          class="form-control"
-          placeholder="Qo'shimcha nom..."
-        />
-      </div>
+      <form @submit.prevent="saveProduct" class="space-y-6">
+        <div class="row g-4">
+          <div class="col-lg-8 space-y-4">
+            <div class="form-section card p-4 shadow-sm">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4">Asosiy ma'lumotlar</h2>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="code" class="form-label">Код</label>
+                  <input
+                    type="text"
+                    id="code"
+                    v-model="product.code"
+                    class="form-control form-control-custom"
+                    readonly
+                  />
+                </div>
+                <div class="col-md-8">
+                  <label for="generalName" class="form-label">Умумий номи</label>
+                  <input
+                    type="text"
+                    id="generalName"
+                    v-model="product.general_name"
+                    class="form-control form-control-custom"
+                    placeholder="Nomi 13 14 qizil 11 16 12 15"
+                  />
+                </div>
+              </div>
+              <div class="mt-3">
+                <label for="name" class="form-label">Номи</label>
+                <input
+                  type="text"
+                  id="name"
+                  v-model="product.name"
+                  class="form-control form-control-custom"
+                  placeholder="Nomi"
+                />
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-lg-6">
+                <div class="form-section card p-4 shadow-sm">
+                  <h3 class="text-md font-medium text-gray-900 mb-4">Xususiyatlar</h3>
+                  <div class="space-y-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Ед.изм.</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.unit_id"
+                          :options="units"
+                          label="name"
+                          :reduce="unit => unit.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('unit')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Бренд</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.brand_id"
+                          :options="brands"
+                          label="name"
+                          :reduce="brand => brand.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('brand')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Модел</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.model_id"
+                          :options="models"
+                          label="name"
+                          :reduce="model => model.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('model')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <div class="form-section card p-4 shadow-sm">
+                  <h3 class="text-md font-medium text-gray-900 mb-4">Joylashuv va tasnif</h3>
+                  <div class="space-y-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Давлат</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.country_id"
+                          :options="countries"
+                          label="name"
+                          :reduce="country => country.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('country')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Гуруҳ</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.group_id"
+                          :options="groups"
+                          label="name"
+                          :reduce="group => group.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('group')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Ранг</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.color_id"
+                          :options="colors"
+                          label="name"
+                          :reduce="color => color.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('color')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="form-section card p-4 shadow-sm">
+                  <h3 class="text-md font-medium text-gray-900 mb-4">Qo'shimcha nomlar</h3>
+                  <div class="space-y-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Доп. Имя 1</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.additional_name_1_id"
+                          :options="additionalNames"
+                          label="name"
+                          :reduce="name => name.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('additionalName1')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Доп. Имя 2</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.additional_name_2_id"
+                          :options="additionalNames"
+                          label="name"
+                          :reduce="name => name.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('additionalName2')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center justify-content-between">
+                      <label class="form-label mb-0 me-2">Доп. Имя 3</label>
+                      <div class="input-with-button flex-grow-1">
+                        <v-select
+                          v-model="product.additional_name_3_id"
+                          :options="additionalNames"
+                          label="name"
+                          :reduce="name => name.id"
+                          placeholder="Tanlang..."
+                          class="custom-v-select"
+                          :clearable="false"
+                        ></v-select>
+                        <button class="btn-ellipsis" type="button" @click="openModal('additionalName3')"><i class="bi bi-three-dots"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section card p-4 shadow-sm">
+              <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="text-md font-medium text-gray-900">Штрих код</h3>
+                <button type="button" class="btn btn-primary btn-sm" @click="addBarcode">
+                  <i class="bi bi-plus-lg me-1"></i> Янги штрих
+                </button>
+              </div>
+              <div class="space-y-3">
+                <div v-for="(barcode, index) in product.barcodes" :key="index" class="d-flex align-items-center space-x-3">
+                  <span class="text-sm text-gray-500 w-4">{{ index + 1 }}</span>
+                  <input
+                    type="text"
+                    v-model="barcode.code"
+                    class="form-control form-control-sm flex-grow-1"
+                    placeholder="Штрих код"
+                  />
+                  <button
+                    type="button"
+                    @click="removeBarcode(index)"
+                    class="btn btn-outline-danger btn-sm"
+                  >
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4 space-y-4">
+            <div class="form-section card p-4 shadow-sm">
+              <h3 class="text-md font-medium text-gray-900 mb-4">Sozlamalar</h3>
+              <div class="space-y-3">
+                <div class="d-flex align-items-center justify-content-between">
+                  <label class="form-label mb-0">Папка</label>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="isFolderSwitch" v-model="product.is_folder">
+                    <label class="form-check-label" for="isFolderSwitch"></label>
+                  </div>
+                </div>
+                
+                <div>
+                  <label for="packCount" class="form-label">Пачка</label>
+                  <input
+                    type="number"
+                    id="packCount"
+                    v-model.number="product.pack_count"
+                    class="form-control form-control-custom text-center"
+                    min="0"
+                  />
+                </div>
+                
+                <div>
+                  <label for="minCount" class="form-label">Минимал сон</label>
+                  <input
+                    type="number"
+                    id="minCount"
+                    v-model.number="product.min_count"
+                    class="form-control form-control-custom text-center"
+                    min="0"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section card p-4 shadow-sm">
+              <h3 class="text-md font-medium text-gray-900 mb-4">Фото</h3>
+              <div class="image-upload-area">
+                <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" style="display: none;" />
+                <div class="image-placeholder" @click="triggerFileInput">
+                    <img v-if="product.image_url" :src="product.image_url" alt="Product Image" class="uploaded-image" />
+                    <img v-else-if="imagePreviewUrl" :src="imagePreviewUrl" alt="Image Preview" class="uploaded-image" />
+                    <i v-else class="bi bi-image image-icon-placeholder"></i>
+                    <div class="overlay" v-if="!product.image_url && !imagePreviewUrl">
+                        <button type="button" class="btn btn-light choose-file-btn">Choose File</button>
+                        <span class="file-name text-muted">{{ selectedFileName || 'No file chosen' }}</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button type="button" class="btn btn-light btn-sm" @click="triggerFileInput">Choose File</button>
+                    <span class="text-sm text-gray-500 flex-grow-1 ms-2 me-2">{{ selectedFileName || 'No file chosen' }}</span>
+                    <button v-if="selectedFileName || product.image_url" type="button" class="btn btn-outline-danger btn-sm" @click="clearImage">
+                        <i class="bi bi-x-circle-fill"></i>
+                    </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
 
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <label for="unit_id" class="form-label">Ед.изм. (Unit)</label>
-        <select
-          id="unit_id"
-          v-model="datasend.unit_id"
-          class="form-select"
-          required
-        >
-          <option value="" disabled>Tanlang...</option>
-          <option v-for="unit in units" :key="unit.id" :value="unit.id">
-            {{ unit.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="brand_id" class="form-label">Бренд (Brand)</label>
-        <select
-          id="brand_id"
-          v-model="datasend.brand_id"
-          class="form-select"
-          required
-        >
-          <option value="" disabled>Tanlang...</option>
-          <option v-for="brand in brands" :key="brand.id" :value="brand.id">
-            {{ brand.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="model_id" class="form-label">Модел (Model)</label>
-        <select
-          id="model_id"
-          v-model="datasend.model_id"
-          class="form-select"
-          required
-        >
-          <option value="" disabled>Tanlang...</option>
-          <option v-for="model in models" :key="model.id" :value="model.id">
-            {{ model.name }}
-          </option>
-        </select>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col-md-4">
-        <label for="colour_id" class="form-label">Ранг (Color)</label>
-        <select
-          id="colour_id"
-          v-model="datasend.colour_id"
-          class="form-select"
-          required
-        >
-          <option value="" disabled>Tanlang...</option>
-          <option v-for="colour in colours" :key="colour.id" :value="colour.id">
-            {{ colour.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="country_id" class="form-label">Давпат (Country)</label>
-        <select
-          id="country_id"
-          v-model="datasend.country_id"
-          class="form-select"
-          required
-        >
-          <option value="" disabled>Tanlang...</option>
-          <option v-for="country in countries" :key="country.id" :value="country.id">
-            {{ country.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label for="quality" class="form-label">Quality</label>
-        <input
-          type="text"
-          id="quality"
-          v-model="datasend.quality"
-          class="form-control"
-          placeholder="Quality..."
-        />
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col-md-3">
-        <label for="is_folder" class="form-label">Is Folder</label>
-        <select
-          id="is_folder"
-          v-model="datasend.is_folder"
-          class="form-select"
-        >
-          <option value="0">No</option>
-          <option value="1">Yes</option>
-        </select>
-      </div>
-
-      <div class="col-md-3">
-        <label for="parent_id" class="form-label">Parent ID</label>
-        <input
-          type="number"
-          id="parent_id"
-          v-model="datasend.parent_id"
-          class="form-control"
-          placeholder="Parent ID..."
-        />
-      </div>
-
-      <div class="col-md-6">
-        <label for="picture_name" class="form-label">Фото (Photo)</label>
-        <input
-          type="file"
-          id="picture_name"
-          class="form-control"
-          @change="handleFileUpload"
-        />
-        <div v-if="imagePreview" class="mt-2">
-  <img :src="imagePreview" alt="Mahsulot rasmi" class="img-thumbnail" style="max-height: 200px;" />
-</div>
-      </div>
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label">Штрих коды (Barcodes)</label>
-      <div v-for="(code, index) in datasend.shtrix_table" :key="index" class="input-group mb-2">
-        <input
-          type="text"
-          v-model="code.shtrix_kod"
-          class="form-control"
-          placeholder="Barcode"
-        />
-        <button
-          v-if="datasend.shtrix_table.length > 1"
-          class="btn btn-outline-danger"
-          type="button"
-          @click="removeShtrix(index)"
-        >
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>
-      <button
-        type="button"
-        class="btn btn-outline-primary btn-sm"
-        @click="addShtrix"
-      >
-        <i class="bi bi-plus"></i> Add Barcode
-      </button>
-    </div>
-
-    <div class="d-flex justify-content-end">
-      <button type="button" class="btn btn-primary" @click="Send">
-        <i class="bi bi-save"></i> Saqlash
-      </button>
-    </div>
-  </form>
+    <GenericSelectModal
+      :showModal="showUnitModal"
+      title="Ўлчов бирликлари"
+      apiEndpoint="unit"
+      @close="showUnitModal = false"
+      @select="selectItem('unit', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showBrandModal"
+      title="Брендлар"
+      apiEndpoint="brand"
+      @close="showBrandModal = false"
+      @select="selectItem('brand', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showModelModal"
+      title="Моделлар"
+      apiEndpoint="model"
+      @close="showModelModal = false"
+      @select="selectItem('model', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showCountryModal"
+      title="Давлатлар"
+      apiEndpoint="country"
+      @close="showCountryModal = false"
+      @select="selectItem('country', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showGroupModal"
+      title="Гуруҳлар"
+      apiEndpoint="group"
+      @close="showGroupModal = false"
+      @select="selectItem('group', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showColorModal"
+      title="Ранглар"
+      apiEndpoint="color"
+      @close="showColorModal = false"
+      @select="selectItem('color', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showAdditionalName1Modal"
+      title="Қўшимча номлар 1"
+      apiEndpoint="additional-name"
+      @close="showAdditionalName1Modal = false"
+      @select="selectItem('additionalName1', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showAdditionalName2Modal"
+      title="Қўшимча номлар 2"
+      apiEndpoint="additional-name"
+      @close="showAdditionalName2Modal = false"
+      @select="selectItem('additionalName2', $event)"
+      @refresh="fetchDropdownData"
+    />
+    <GenericSelectModal
+      :showModal="showAdditionalName3Modal"
+      title="Қўшимча номлар 3"
+      apiEndpoint="additional-name"
+      @close="showAdditionalName3Modal = false"
+      @select="selectItem('additionalName3', $event)"
+      @refresh="fetchDropdownData"
+    />
+  </div>
 </template>
 
-<script>
-export default {
-  data() {
-  return {
-    datasend: {
-      name: "",
-      extra_name: "",
-      unit_id: "",
-      brand_id: "",
-      model_id: "",
-      colour_id: "",
-      country_id: "",
-      quality: "",
-      is_folder: "0",
-      parent_id: "0",
-      picture_name: null,
-      shtrix_table: [{ shtrix_kod: "" }]
-    },
-    units: [],
-    brands: [],
-    models: [],
-    colours: [],
-    countries: [],
-    imagePreview: null // ✅ Rasmlarni ko‘rsatish uchun preview
-  };
-},
+<script setup lang="ts">
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css'; // v-select CSS import
+import GenericSelectModal from '@/components/GenericSelectModal.vue'; // Sizning GenericSelectModal komponentangiz
+import axios from 'axios'; // Axios import
+import { useRoute, useRouter } from 'vue-router'; // Vue Router hooklari
 
-  created() {
-    this.fetchDropdownData();
-    if (this.$route.params.id) {
-      this.fetchProductData();
-    }
-  },
-  methods: {
-    fetchDropdownData() {
-      const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-      
-      const endpoints = [
-        this.$axios.get("api/v1/unit", { headers }),
-        this.$axios.get("api/v1/brand", { headers }),
-        this.$axios.get("api/v1/model", { headers }),
-        this.$axios.get("api/v1/colour", { headers }),
-        this.$axios.get("api/v1/country", { headers })
-      ];
-
-      Promise.all(endpoints)
-        .then(([unitsRes, brandsRes, modelsRes, coloursRes, countriesRes]) => {
-          this.units = unitsRes.data;
-          this.brands = brandsRes.data;
-          this.models = modelsRes.data;
-          this.colours = coloursRes.data;
-          this.countries = countriesRes.data;
-        })
-        .catch(error => {
-          console.error("Error fetching dropdown data:", error);
-        });
-    },
-    fetchProductData() {
-      const token = localStorage.getItem("token");
-      
-      this.$axios
-        .get(`api/v1/product/id/${this.$route.params.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(response => {
-          const productData = response.data;
-          this.datasend = {
-  name: productData.name,
-  extra_name: productData.extra_name || "",
-  unit_id: productData.unit_id || "",
-  brand_id: productData.brand_id || "",
-  model_id: productData.model_id || "",
-  colour_id: productData.colour_id || "",
-  country_id: productData.country_id || "",
-  quality: productData.quality || "",
-  is_folder: productData.is_folder?.toString() || "0",
-  parent_id: productData.parent_id?.toString() || "0",
-  picture_name: null,
-  shtrix_table: productData.shtrix_table || [{ shtrix_kod: "" }]
-};
-this.imagePreview = 'http://185.76.13.223:3084/api/v1/uploads/'+productData.picture_name || null;
-console.log(this.imagePreview)
-        })
-        .catch(error => {
-          console.error("Error fetching product data:", error);
-        });
-    },
-    handleFileUpload(event) {
-  const file = event.target.files[0];
-  this.datasend.picture_name = file;
-
-  if (file) {
-    this.imagePreview = URL.createObjectURL(file);
-  } else {
-    this.imagePreview = null;
-  }
+interface Barcode {
+  code: string;
 }
-,
-    addShtrix() {
-      this.datasend.shtrix_table.push({ shtrix_kod: "" });
-    },
-    removeShtrix(index) {
-      this.datasend.shtrix_table.splice(index, 1);
-    },
-    Send() {
-      const token = localStorage.getItem("token");
-      const formData = new FormData();
 
-      // Append all form data to FormData object
-      Object.keys(this.datasend).forEach(key => {
-        if (key === "shtrix_table") {
-          this.datasend[key].forEach((item, index) => {
-            formData.append(`shtrix_table[${index}][shtrix_kod]`, item.shtrix_kod);
-          });
-        } else if (key === "picture_name" && this.datasend[key]) {
-          formData.append(key, this.datasend[key]);
-        } else if (this.datasend[key] !== null) {
-          formData.append(key, this.datasend[key]);
-        }
-      });
+interface ProductForm {
+  id: number | null;
+  code: string;
+  general_name: string;
+  name: string;
+  unit_id: number | null;
+  brand_id: number | null;
+  model_id: number | null;
+  country_id: number | null;
+  group_id: number | null;
+  color_id: number | null;
+  additional_name_1_id: number | null;
+  additional_name_2_id: number | null;
+  additional_name_3_id: number | null;
+  is_folder: boolean;
+  pack_count: number;
+  min_count: number;
+  image_url: string | null; // Backenddan kelgan rasm URL
+  barcodes: Barcode[];
+}
 
-      const method = this.$route.params.id ? "patch" : "post";
-      const url = this.$route.params.id 
-        ? `api/v1/product/id/${this.$route.params.id}`
-        : "api/v1/product";
+const route = useRoute();
+const router = useRouter();
+const isEditMode = computed(() => !!route.params.id);
 
-      this.$axios({
-        method,
-        url,
-        data: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data"
-        }
-      })
-        .then(response => {
-          this.$router.push({ path: "/products" });
-        })
-        .catch(error => {
-          if (error.response) {
-            console.error("Xato javob:", error.response.data);
-          } else if (error.request) {
-            console.error("Serverdan javob kelmadi:", error.request);
-          } else {
-            console.error("So'rov xatosi:", error.message);
-          }
-        });
-    }
+const product = reactive<ProductForm>({
+  id: null,
+  code: '101', // Rasmda 101 ko'rsatilgan, agar avtomatik bo'lmasa
+  general_name: '',
+  name: '',
+  unit_id: null,
+  brand_id: null,
+  model_id: null,
+  country_id: null,
+  group_id: null,
+  color_id: null,
+  additional_name_1_id: null,
+  additional_name_2_id: null,
+  additional_name_3_id: null,
+  is_folder: false,
+  pack_count: 1,
+  min_count: 1,
+  image_url: null,
+  barcodes: [{ code: '' }], // Kamida bitta bo'sh barcode
+});
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
+const selectedFileName = ref<string>('');
+const imagePreviewUrl = ref<string | null>(null);
+
+// Dropdown options
+const units = ref<Array<{ id: number; name: string }>>([]);
+const brands = ref<Array<{ id: number; name: string }>>([]);
+const models = ref<Array<{ id: number; name: string }>>([]);
+const countries = ref<Array<{ id: number; name: string }>>([]);
+const groups = ref<Array<{ id: number; name: string }>>([]);
+const colors = ref<Array<{ id: number; name: string }>>([]);
+const additionalNames = ref<Array<{ id: number; name: string }>>([]);
+
+// Modals visibility
+const showUnitModal = ref(false);
+const showBrandModal = ref(false);
+const showModelModal = ref(false);
+const showCountryModal = ref(false);
+const showGroupModal = ref(false);
+const showColorModal = ref(false);
+const showAdditionalName1Modal = ref(false);
+const showAdditionalName2Modal = ref(false);
+const showAdditionalName3Modal = ref(false);
+
+const openModal = (type: string) => {
+  if (type === 'unit') showUnitModal.value = true;
+  else if (type === 'brand') showBrandModal.value = true;
+  else if (type === 'model') showModelModal.value = true;
+  else if (type === 'country') showCountryModal.value = true;
+  else if (type === 'group') showGroupModal.value = true;
+  else if (type === 'color') showColorModal.value = true;
+  else if (type === 'additionalName1') showAdditionalName1Modal.value = true;
+  else if (type === 'additionalName2') showAdditionalName2Modal.value = true;
+  else if (type === 'additionalName3') showAdditionalName3Modal.value = true;
+};
+
+const selectItem = (type: string, id: number) => {
+  if (type === 'unit') product.unit_id = id;
+  else if (type === 'brand') product.brand_id = id;
+  else if (type === 'model') product.model_id = id;
+  else if (type === 'country') product.country_id = id;
+  else if (type === 'group') product.group_id = id;
+  else if (type === 'color') product.color_id = id;
+  else if (type === 'additionalName1') product.additional_name_1_id = id;
+  else if (type === 'additionalName2') product.additional_name_2_id = id;
+  else if (type === 'additionalName3') product.additional_name_3_id = id;
+};
+
+const fetchDropdownData = async () => {
+  const token = localStorage.getItem("token"); // Tokenni localStorage'dan olish
+  const headers = { Authorization: `Bearer ${token}` };
+
+  try {
+    const [
+      unitsRes, brandsRes, modelsRes, countriesRes, groupsRes, colorsRes, additionalNamesRes
+    ] = await Promise.all([
+      axios.get("api/v1/unit", { headers }),
+      axios.get("api/v1/brand", { headers }),
+      axios.get("api/v1/model", { headers }),
+      axios.get("api/v1/country", { headers }),
+      axios.get("api/v1/group", { headers }),
+      axios.get("api/v1/color", { headers }),
+      axios.get("api/v1/additional-name", { headers }), // O'zingizga mos API endpoint
+    ]);
+    units.value = unitsRes.data;
+    brands.value = brandsRes.data;
+    models.value = modelsRes.data;
+    countries.value = countriesRes.data;
+    groups.value = groupsRes.data;
+    colors.value = colorsRes.data;
+    additionalNames.value = additionalNamesRes.data;
+  } catch (error) {
+    console.error("Error fetching dropdown data:", error);
+    // Xato xabarnomasini ko'rsatish
   }
 };
+
+const fetchProductData = async () => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await axios.get(`api/v1/product/id/${route.params.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = response.data;
+    Object.assign(product, data);
+    // Barcodelarni to'g'ri yuklash
+    if (data.barcodes && data.barcodes.length > 0) {
+      product.barcodes = data.barcodes.map((b: { code: string }) => ({ code: b.code }));
+    } else {
+      product.barcodes = [{ code: '' }];
+    }
+    // Agar rasm mavjud bo'lsa
+    if (product.image_url) {
+        imagePreviewUrl.value = product.image_url;
+        selectedFileName.value = product.image_url.split('/').pop() || ''; // Fayl nomini olish
+    }
+  } catch (error) {
+    console.error("Error fetching product data:", error);
+    // Xato xabarnomasini ko'rsatish
+  }
+};
+
+const addBarcode = () => {
+  product.barcodes.push({ code: '' });
+};
+
+const removeBarcode = (index: number) => {
+  if (product.barcodes.length > 1) {
+    product.barcodes.splice(index, 1);
+  } else {
+    product.barcodes[0].code = ''; // oxirgi bitta qolsa tozalash
+  }
+};
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (file) {
+    selectedFile.value = file;
+    selectedFileName.value = file.name;
+    imagePreviewUrl.value = URL.createObjectURL(file);
+    product.image_url = null; // Yangi rasm yuklanganda eski URL ni o'chiramiz
+  } else {
+    selectedFile.value = null;
+    selectedFileName.value = '';
+    imagePreviewUrl.value = null;
+  }
+};
+
+const clearImage = () => {
+  selectedFile.value = null;
+  selectedFileName.value = '';
+  imagePreviewUrl.value = null;
+  product.image_url = null;
+  if (fileInput.value) {
+    fileInput.value.value = ''; // Inputni tozalash
+  }
+};
+
+const saveProduct = async () => {
+  const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
+
+  const formData = new FormData();
+  for (const key in product) {
+    if (key === 'barcodes') {
+        formData.append('barcodes', JSON.stringify(product.barcodes));
+    } else if (key === 'is_folder') {
+        formData.append(key, product[key] ? '1' : '0'); // Backend 0/1 talab qilsa
+    } else if (key === 'image_url') {
+        // Agar yangi rasm tanlangan bo'lsa
+        if (selectedFile.value) {
+            formData.append('image', selectedFile.value);
+        } else if (product.image_url === null && !selectedFile.value && isEditMode.value) {
+            // Tahrirlash rejimida rasm o'chirilgan bo'lsa
+            formData.append('image_removed', '1');
+        }
+    } else if (product[key] !== null) { // Null bo'lgan maydonlarni yubormaslik
+        formData.append(key, String(product[key]));
+    }
+  }
+
+  const method = isEditMode.value ? 'post' : 'post'; // PUT/PATCH uchun axios FormData bilan murakkabroq, shuning uchun POST ni qo'llaymiz
+  const url = isEditMode.value
+    ? `api/v1/product/update/${product.id}` // Tahrirlash uchun maxsus endpoint
+    : 'api/v1/product/store'; // Qo'shish uchun maxsus endpoint
+
+  try {
+    await axios({
+      method,
+      url,
+      data: formData,
+      headers: {
+        ...headers,
+        'Content-Type': 'multipart/form-data', // Fayl yuklash uchun kerak
+      },
+    });
+    alert('Mahsulot muvaffaqiyatli saqlandi!');
+    router.push({ path: "/products" }); // Mahsulotlar ro'yxatiga qaytish
+  } catch (error: any) {
+    console.error("Error saving product data:", error.response ? error.response.data : error.message);
+    alert('Mahsulot ma\'lumotlarini saqlashda xatolik yuz berdi: ' + (error.response?.data?.message || error.message));
+  }
+};
+
+const handleExit = () => {
+  router.back();
+};
+
+// Klaviatura tezkor tugmalari
+const handleKeyDown = (event: KeyboardEvent) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+    event.preventDefault();
+    saveProduct();
+  } else if (event.key === 'Escape') {
+    event.preventDefault();
+    handleExit();
+  }
+};
+
+onMounted(() => {
+  fetchDropdownData();
+  if (isEditMode.value) {
+    product.id = Number(route.params.id); // ID ni o'rnatish
+    fetchProductData();
+  }
+  window.addEventListener('keydown', handleKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
+  if (imagePreviewUrl.value) {
+    URL.revokeObjectURL(imagePreviewUrl.value);
+  }
+});
 </script>
+
+<style scoped>
+.product-form-container {
+  background-color: #F0F2F5; /* Umumiy fon rangi */
+}
+
+.card {
+  border-radius: 0.75rem; /* Border-radiusni oshirish */
+  border: 1px solid #E2E8F0; /* Yengilroq chegara */
+}
+
+.form-section {
+  background-color: #FFFFFF;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Yengilroq soya */
+  padding: 1.5rem;
+}
+
+.text-2xl {
+  font-size: 1.75rem; /* Kichikroq sarlavha */
+}
+.font-bold {
+  font-weight: 700;
+}
+.text-gray-900 {
+  color: #1A202C;
+}
+.text-gray-600 {
+  color: #4A5568;
+}
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background-color: #3B82F6;
+  border-color: #3B82F6;
+  color: white;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-primary:hover {
+  background-color: #2563EB;
+  border-color: #2563EB;
+}
+
+.btn-secondary {
+  background-color: #6B7280;
+  border-color: #6B7280;
+  color: white;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-secondary:hover {
+  background-color: #4B5563;
+  border-color: #4B5563;
+}
+
+.shortcut {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4A5568;
+  margin-bottom: 0.5rem; /* Tailwinddan kelgan marginni Bootstrapga moslash */
+  display: block; /* Labelni alohida qatorga o'tkazish */
+}
+
+.form-control-custom {
+  background-color: #F7FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  color: #2D3748;
+  height: calc(2.4rem + 2px); /* Bootstrap form-controlning standart balandligi */
+}
+
+.form-control-custom:focus {
+  border-color: #63B3ED;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Primary rangga moslash */
+  outline: none;
+}
+
+/* v-select custom styles */
+.custom-v-select.vs--single .vs__dropdown-toggle,
+.custom-v-select.vs--multiple .vs__dropdown-toggle {
+  background-color: #F7FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.5rem;
+  padding: 0.375rem 1rem; /* Kichikroq padding */
+  min-height: calc(2.4rem + 2px);
+  display: flex;
+  align-items: center;
+  box-shadow: none;
+}
+
+.custom-v-select .vs__selected-options {
+  padding: 0;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+}
+
+.custom-v-select .vs__selected {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0;
+  margin: 0;
+  color: #2D3748;
+  font-size: 0.95rem;
+}
+
+.custom-v-select .vs__actions {
+  padding: 0 0 0 8px;
+}
+
+.custom-v-select .vs__clear,
+.custom-v-select .vs__open-indicator {
+  fill: #A0AEC0;
+}
+
+.custom-v-select.vs--open .vs__dropdown-toggle {
+  border-color: #63B3ED;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.input-with-button {
+  display: flex;
+  width: 100%;
+}
+
+.input-with-button .custom-v-select {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-with-button .btn-ellipsis {
+  width: calc(2.4rem + 2px); /* Input balandligiga moslash */
+  height: calc(2.4rem + 2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #EDF2F7;
+  border: 1px solid #E2E8F0;
+  border-left: none;
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #718096;
+  transition: background-color 0.2s ease;
+}
+
+.input-with-button .btn-ellipsis:hover {
+  background-color: #E2E8F0;
+}
+
+/* Barcode section */
+.barcode-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.barcode-item .form-control-sm {
+  height: calc(1.8rem + 2px); /* Kichikroq input */
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  background-color: #F7FAFC;
+  border-color: #E2E8F0;
+}
+
+.barcode-item .btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+}
+
+/* Image Upload Section */
+.image-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-placeholder {
+  width: 100%;
+  max-width: 300px; /* Rasm joylashadigan maydonning maksimal kengligi */
+  height: 200px;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  background-color: #F7FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.image-placeholder .uploaded-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.image-placeholder .image-icon-placeholder {
+  font-size: 4rem;
+  color: #CBD5E0;
+}
+
+.image-placeholder .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.7); /* Rasmni tanlash uchun ustida turadigan fon */
+    z-index: 5;
+}
+
+.image-placeholder .choose-file-btn {
+  background-color: #EDF2F7;
+  border: 1px solid #E2E8F0;
+  color: #3B82F6;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.image-placeholder .choose-file-btn:hover {
+  background-color: #E2E8F0;
+}
+
+.image-placeholder .file-name {
+  font-size: 0.75rem;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+  margin-top: 0.25rem;
+}
+</style>
