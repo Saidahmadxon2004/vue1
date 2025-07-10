@@ -1,3 +1,4 @@
+
 <template>
   <div class="product-form-container min-h-screen py-8">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,7 +11,7 @@
               </svg>
             </div>
             <div>
-              <h1 class="text-2xl font-bold text-gray-900 mb-0">Nomi {{ product.general_name }} (Product qo'shish)</h1>
+              <h1 class="text-2xl font-bold text-gray-900 mb-0">Nomi {{ product.general_name || 'Mahsulot' }} ({{ isEditMode ? 'Tahrirlash' : 'Qoshish' }})</h1>
               <p class="text-gray-600 text-sm">Mahsulot ma'lumotlarini to'ldiring</p>
             </div>
           </div>
@@ -19,7 +20,7 @@
               <i class="bi bi-x-circle me-1"></i> Чиқиш <span class="shortcut">Esc</span>
             </button>
             <button type="submit" class="btn btn-primary" @click="saveProduct">
-              <i class="bi bi-save me-1"></i> Сақлаш ва беркитиш <span class="shortcut">Ctrl+Enter</span>
+              <i class="bi bi-save me-1"></i> {{ isEditMode ? 'Yangilash' : 'Saqlash' }} <span class="shortcut">Ctrl+Enter</span>
             </button>
           </div>
         </div>
@@ -42,13 +43,14 @@
                   />
                 </div>
                 <div class="col-md-8">
-                  <label for="generalName" class="form-label">Умумий номи</label>
+                  <label for="generalName" class="form-label">Умумий номи <span class="text-danger">*</span></label>
                   <input
                     type="text"
                     id="generalName"
                     v-model="product.general_name"
                     class="form-control form-control-custom"
-                    placeholder="Nomi 13 14 qizil 11 16 12 15"
+                    placeholder="Avtomatik to'ldiriladi"
+                    readonly
                   />
                 </div>
               </div>
@@ -59,7 +61,7 @@
                   id="name"
                   v-model="product.name"
                   class="form-control form-control-custom"
-                  placeholder="Nomi"
+                  placeholder="Mahsulot nomi"
                 />
               </div>
             </div>
@@ -271,6 +273,19 @@
                   </div>
                 </div>
                 
+                <div v-if="product.is_folder">
+                  <label for="parentId" class="form-label">Asosiy katalog ID</label>
+                  <input
+                    type="number"
+                    id="parentId"
+                    v-model.number="product.parent_id"
+                    class="form-control form-control-custom"
+                    placeholder="Asosiy katalog ID"
+                    min="0"
+                  />
+                  <small class="text-muted">Faqat katalog bo'lsa to'ldiriladi.</small>
+                </div>
+                
                 <div>
                   <label for="packCount" class="form-label">Пачка</label>
                   <input
@@ -300,20 +315,20 @@
               <div class="image-upload-area">
                 <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" style="display: none;" />
                 <div class="image-placeholder" @click="triggerFileInput">
-                    <img v-if="product.image_url" :src="product.image_url" alt="Product Image" class="uploaded-image" />
-                    <img v-else-if="imagePreviewUrl" :src="imagePreviewUrl" alt="Image Preview" class="uploaded-image" />
-                    <i v-else class="bi bi-image image-icon-placeholder"></i>
-                    <div class="overlay" v-if="!product.image_url && !imagePreviewUrl">
-                        <button type="button" class="btn btn-light choose-file-btn">Choose File</button>
-                        <span class="file-name text-muted">{{ selectedFileName || 'No file chosen' }}</span>
-                    </div>
+                  <img v-if="product.image_url" :src="product.image_url" alt="Product Image" class="uploaded-image" />
+                  <img v-else-if="imagePreviewUrl" :src="imagePreviewUrl" alt="Image Preview" class="uploaded-image" />
+                  <i v-else class="bi bi-image image-icon-placeholder"></i>
+                  <div class="overlay" v-if="!product.image_url && !imagePreviewUrl">
+                    <button type="button" class="btn btn-light choose-file-btn">Choose File</button>
+                    <span class="file-name text-muted">{{ selectedFileName || 'No file chosen' }}</span>
+                  </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-3">
-                    <button type="button" class="btn btn-light btn-sm" @click="triggerFileInput">Choose File</button>
-                    <span class="text-sm text-gray-500 flex-grow-1 ms-2 me-2">{{ selectedFileName || 'No file chosen' }}</span>
-                    <button v-if="selectedFileName || product.image_url" type="button" class="btn btn-outline-danger btn-sm" @click="clearImage">
-                        <i class="bi bi-x-circle-fill"></i>
-                    </button>
+                  <button type="button" class="btn btn-light btn-sm" @click="triggerFileInput">Choose File</button>
+                  <span class="text-sm text-gray-500 flex-grow-1 ms-2 me-2">{{ selectedFileName || 'No file chosen' }}</span>
+                  <button v-if="selectedFileName || product.image_url" type="button" class="btn btn-outline-danger btn-sm" @click="clearImage">
+                    <i class="bi bi-x-circle-fill"></i>
+                  </button>
                 </div>
               </div>
             </div>
@@ -354,18 +369,11 @@
       @select="selectItem('country', $event)"
       @refresh="fetchDropdownData"
     />
-    <GenericSelectModal
-      :showModal="showGroupModal"
-      title="Гуруҳлар"
-      apiEndpoint="group"
-      @close="showGroupModal = false"
-      @select="selectItem('group', $event)"
-      @refresh="fetchDropdownData"
-    />
+    
     <GenericSelectModal
       :showModal="showColorModal"
       title="Ранглар"
-      apiEndpoint="color"
+      apiEndpoint="colour"
       @close="showColorModal = false"
       @select="selectItem('color', $event)"
       @refresh="fetchDropdownData"
@@ -373,7 +381,7 @@
     <GenericSelectModal
       :showModal="showAdditionalName1Modal"
       title="Қўшимча номлар 1"
-      apiEndpoint="additional-name"
+      apiEndpoint="extra-unit"
       @close="showAdditionalName1Modal = false"
       @select="selectItem('additionalName1', $event)"
       @refresh="fetchDropdownData"
@@ -381,7 +389,7 @@
     <GenericSelectModal
       :showModal="showAdditionalName2Modal"
       title="Қўшимча номлар 2"
-      apiEndpoint="additional-name"
+      apiEndpoint="extra-unit"
       @close="showAdditionalName2Modal = false"
       @select="selectItem('additionalName2', $event)"
       @refresh="fetchDropdownData"
@@ -389,7 +397,7 @@
     <GenericSelectModal
       :showModal="showAdditionalName3Modal"
       title="Қўшимча номлар 3"
-      apiEndpoint="additional-name"
+      apiEndpoint="extra-unit"
       @close="showAdditionalName3Modal = false"
       @select="selectItem('additionalName3', $event)"
       @refresh="fetchDropdownData"
@@ -397,46 +405,23 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
+<script setup>
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue';
 import vSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css'; // v-select CSS import
-import GenericSelectModal from '@/components/GenericSelectModal.vue'; // Sizning GenericSelectModal komponentangiz
-import axios from 'axios'; // Axios import
-import { useRoute, useRouter } from 'vue-router'; // Vue Router hooklari
-
-interface Barcode {
-  code: string;
-}
-
-interface ProductForm {
-  id: number | null;
-  code: string;
-  general_name: string;
-  name: string;
-  unit_id: number | null;
-  brand_id: number | null;
-  model_id: number | null;
-  country_id: number | null;
-  group_id: number | null;
-  color_id: number | null;
-  additional_name_1_id: number | null;
-  additional_name_2_id: number | null;
-  additional_name_3_id: number | null;
-  is_folder: boolean;
-  pack_count: number;
-  min_count: number;
-  image_url: string | null; // Backenddan kelgan rasm URL
-  barcodes: Barcode[];
-}
+import 'vue-select/dist/vue-select.css';
+import GenericSelectModal from '@/components/GenericSelectModal.vue';
+import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
+// import { useToast } from 'vue-toastification';
 
 const route = useRoute();
 const router = useRouter();
+// const toast = useToast();
 const isEditMode = computed(() => !!route.params.id);
 
-const product = reactive<ProductForm>({
+const product = reactive({
   id: null,
-  code: '101', // Rasmda 101 ko'rsatilgan, agar avtomatik bo'lmasa
+  code: '',
   general_name: '',
   name: '',
   unit_id: null,
@@ -449,27 +434,26 @@ const product = reactive<ProductForm>({
   additional_name_2_id: null,
   additional_name_3_id: null,
   is_folder: false,
+  parent_id: null,
   pack_count: 1,
   min_count: 1,
   image_url: null,
-  barcodes: [{ code: '' }], // Kamida bitta bo'sh barcode
+  barcodes: [{ code: '' }],
 });
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const selectedFile = ref<File | null>(null);
-const selectedFileName = ref<string>('');
-const imagePreviewUrl = ref<string | null>(null);
+const fileInput = ref(null);
+const selectedFile = ref(null);
+const selectedFileName = ref('');
+const imagePreviewUrl = ref(null);
 
-// Dropdown options
-const units = ref<Array<{ id: number; name: string }>>([]);
-const brands = ref<Array<{ id: number; name: string }>>([]);
-const models = ref<Array<{ id: number; name: string }>>([]);
-const countries = ref<Array<{ id: number; name: string }>>([]);
-const groups = ref<Array<{ id: number; name: string }>>([]);
-const colors = ref<Array<{ id: number; name: string }>>([]);
-const additionalNames = ref<Array<{ id: number; name: string }>>([]);
+const units = ref([]);
+const brands = ref([]);
+const models = ref([]);
+const countries = ref([]);
+const groups = ref([]);
+const colors = ref([]);
+const additionalNames = ref([]);
 
-// Modals visibility
 const showUnitModal = ref(false);
 const showBrandModal = ref(false);
 const showModelModal = ref(false);
@@ -480,7 +464,7 @@ const showAdditionalName1Modal = ref(false);
 const showAdditionalName2Modal = ref(false);
 const showAdditionalName3Modal = ref(false);
 
-const openModal = (type: string) => {
+const openModal = (type) => {
   if (type === 'unit') showUnitModal.value = true;
   else if (type === 'brand') showBrandModal.value = true;
   else if (type === 'model') showModelModal.value = true;
@@ -492,7 +476,7 @@ const openModal = (type: string) => {
   else if (type === 'additionalName3') showAdditionalName3Modal.value = true;
 };
 
-const selectItem = (type: string, id: number) => {
+const selectItem = (type, id) => {
   if (type === 'unit') product.unit_id = id;
   else if (type === 'brand') product.brand_id = id;
   else if (type === 'model') product.model_id = id;
@@ -505,20 +489,26 @@ const selectItem = (type: string, id: number) => {
 };
 
 const fetchDropdownData = async () => {
-  const token = localStorage.getItem("token"); // Tokenni localStorage'dan olish
+  const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
   try {
     const [
-      unitsRes, brandsRes, modelsRes, countriesRes, groupsRes, colorsRes, additionalNamesRes
+      unitsRes,
+      brandsRes,
+      modelsRes,
+      countriesRes,
+      groupsRes,
+      colorsRes,
+      additionalNamesRes,
     ] = await Promise.all([
-      axios.get("api/v1/unit", { headers }),
-      axios.get("api/v1/brand", { headers }),
-      axios.get("api/v1/model", { headers }),
-      axios.get("api/v1/country", { headers }),
-      axios.get("api/v1/group", { headers }),
-      axios.get("api/v1/color", { headers }),
-      axios.get("api/v1/additional-name", { headers }), // O'zingizga mos API endpoint
+      axios.get('/api/v1/unit', { headers }),
+      axios.get('/api/v1/brand', { headers }),
+      axios.get('/api/v1/model', { headers }),
+      axios.get('/api/v1/country', { headers }),
+      // axios.get('/api/v1/product/all/0', { headers }),
+      axios.get('/api/v1/colour', { headers }),
+      axios.get('/api/v1/extra-unit', { headers }),
     ]);
     units.value = unitsRes.data;
     brands.value = brandsRes.data;
@@ -528,33 +518,32 @@ const fetchDropdownData = async () => {
     colors.value = colorsRes.data;
     additionalNames.value = additionalNamesRes.data;
   } catch (error) {
-    console.error("Error fetching dropdown data:", error);
-    // Xato xabarnomasini ko'rsatish
+    console.error('Error fetching dropdown data:', error);
+    console.error('Ma\'lumotlarni yuklashda xatolik yuz berdi.');
   }
 };
 
 const fetchProductData = async () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem('token');
   try {
-    const response = await axios.get(`api/v1/product/id/${route.params.id}`, {
+    const response = await axios.get(`/api/v1/product/id/${route.params.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = response.data;
-    Object.assign(product, data);
-    // Barcodelarni to'g'ri yuklash
-    if (data.barcodes && data.barcodes.length > 0) {
-      product.barcodes = data.barcodes.map((b: { code: string }) => ({ code: b.code }));
-    } else {
-      product.barcodes = [{ code: '' }];
-    }
-    // Agar rasm mavjud bo'lsa
-    if (product.image_url) {
-        imagePreviewUrl.value = product.image_url;
-        selectedFileName.value = product.image_url.split('/').pop() || ''; // Fayl nomini olish
+    Object.assign(product, {
+      ...data,
+      is_folder: !!data.is_folder,
+      parent_id: data.parent_id || null,
+      barcodes: data.barcodes && data.barcodes.length > 0 ? data.barcodes.map(b => ({ code: b.code })) : [{ code: '' }],
+    });
+    if (data.image_url) {
+      imagePreviewUrl.value = data.image_url;
+      selectedFileName.value = data.image_url.split('/').pop() || '';
     }
   } catch (error) {
-    console.error("Error fetching product data:", error);
-    // Xato xabarnomasini ko'rsatish
+    console.error('Error fetching product data:', error);
+    console.error('Mahsulot ma\'lumotlarini yuklashda xatolik yuz berdi.');
+    router.push({ path: '/products' });
   }
 };
 
@@ -562,11 +551,11 @@ const addBarcode = () => {
   product.barcodes.push({ code: '' });
 };
 
-const removeBarcode = (index: number) => {
+const removeBarcode = (index) => {
   if (product.barcodes.length > 1) {
     product.barcodes.splice(index, 1);
   } else {
-    product.barcodes[0].code = ''; // oxirgi bitta qolsa tozalash
+    product.barcodes[0].code = '';
   }
 };
 
@@ -574,14 +563,14 @@ const triggerFileInput = () => {
   fileInput.value?.click();
 };
 
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement;
+const handleFileUpload = (event) => {
+  const target = event.target;
   const file = target.files?.[0];
   if (file) {
     selectedFile.value = file;
     selectedFileName.value = file.name;
     imagePreviewUrl.value = URL.createObjectURL(file);
-    product.image_url = null; // Yangi rasm yuklanganda eski URL ni o'chiramiz
+    product.image_url = null;
   } else {
     selectedFile.value = null;
     selectedFileName.value = '';
@@ -595,62 +584,120 @@ const clearImage = () => {
   imagePreviewUrl.value = null;
   product.image_url = null;
   if (fileInput.value) {
-    fileInput.value.value = ''; // Inputni tozalash
+    fileInput.value.value = '';
   }
 };
 
-const saveProduct = async () => {
-  const token = localStorage.getItem("token");
-  const headers = { Authorization: `Bearer ${token}` };
+const updateGeneralName = () => {
+  const parts = [];
 
+  const unit = units.value.find(u => u.id === product.unit_id);
+  if (unit) parts.push(unit.name);
+
+  const brand = brands.value.find(b => b.id === product.brand_id);
+  if (brand) parts.push(brand.name);
+
+  const model = models.value.find(m => m.id === product.model_id);
+  if (model) parts.push(model.name);
+
+  const country = countries.value.find(c => c.id === product.country_id);
+  if (country) parts.push(country.name);
+
+  const color = colors.value.find(c => c.id === product.color_id);
+  if (color) parts.push(color.name);
+
+  const addName1 = additionalNames.value.find(n => n.id === product.additional_name_1_id);
+  if (addName1) parts.push(addName1.name);
+
+  const addName2 = additionalNames.value.find(n => n.id === product.additional_name_2_id);
+  if (addName2) parts.push(addName2.name);
+
+  const addName3 = additionalNames.value.find(n => n.id === product.additional_name_3_id);
+  if (addName3) parts.push(addName3.name);
+
+  product.general_name = parts.join(' ').trim();
+};
+
+watch(
+  () => [
+    product.unit_id,
+    product.brand_id,
+    product.model_id,
+    product.country_id,
+    product.color_id,
+    product.additional_name_1_id,
+    product.additional_name_2_id,
+    product.additional_name_3_id,
+  ],
+  () => {
+    updateGeneralName();
+  },
+  { deep: true }
+);
+
+const saveProduct = async () => {
+  if (!product.general_name || product.general_name.trim() === '') {
+    console.error("Iltimos, umumiy nom maydonini to'ldiring (avtomatik to'ldiriladi).");
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  const headers = { Authorization: `Bearer ${token}` };
   const formData = new FormData();
+
   for (const key in product) {
     if (key === 'barcodes') {
-        formData.append('barcodes', JSON.stringify(product.barcodes));
+      product.barcodes.forEach((barcode, index) => {
+        formData.append(`shtrix_table[${index}][shtrix_kod]`, barcode.code);
+      });
     } else if (key === 'is_folder') {
-        formData.append(key, product[key] ? '1' : '0'); // Backend 0/1 talab qilsa
+      formData.append(key, product[key] ? '1' : '0');
     } else if (key === 'image_url') {
-        // Agar yangi rasm tanlangan bo'lsa
-        if (selectedFile.value) {
-            formData.append('image', selectedFile.value);
-        } else if (product.image_url === null && !selectedFile.value && isEditMode.value) {
-            // Tahrirlash rejimida rasm o'chirilgan bo'lsa
-            formData.append('image_removed', '1');
-        }
-    } else if (product[key] !== null) { // Null bo'lgan maydonlarni yubormaslik
-        formData.append(key, String(product[key]));
+      if (selectedFile.value) {
+        formData.append('picture_name', selectedFile.value);
+      } else if (product.image_url === null && isEditMode.value) {
+        formData.append('picture_name', '');
+      }
+    } else if (product[key] !== null) {
+      formData.append(key, String(product[key]));
     }
   }
 
-  const method = isEditMode.value ? 'post' : 'post'; // PUT/PATCH uchun axios FormData bilan murakkabroq, shuning uchun POST ni qo'llaymiz
-  const url = isEditMode.value
-    ? `api/v1/product/update/${product.id}` // Tahrirlash uchun maxsus endpoint
-    : 'api/v1/product/store'; // Qo'shish uchun maxsus endpoint
+  const method = isEditMode.value ? 'patch' : 'post';
+  const url = isEditMode.value ? `/api/v1/product/id/${product.id}` : '/api/v1/product';
 
   try {
-    await axios({
+    const response = await axios({
       method,
       url,
       data: formData,
       headers: {
         ...headers,
-        'Content-Type': 'multipart/form-data', // Fayl yuklash uchun kerak
+        'Content-Type': 'multipart/form-data',
       },
     });
-    alert('Mahsulot muvaffaqiyatli saqlandi!');
-    router.push({ path: "/products" }); // Mahsulotlar ro'yxatiga qaytish
-  } catch (error: any) {
-    console.error("Error saving product data:", error.response ? error.response.data : error.message);
-    alert('Mahsulot ma\'lumotlarini saqlashda xatolik yuz berdi: ' + (error.response?.data?.message || error.message));
+
+    if ([200, 201, 204].includes(response.status)) {
+      console.success(isEditMode.value ? 'Mahsulot muvaffaqiyatli yangilandi!' : 'Mahsulot muvaffaqiyatli qo\'shildi!');
+      router.push({ path: '/products' });
+    } else {
+      console.error(`Kutilmagan status kodi: ${response.status}`);
+    }
+  } catch (error) {
+    const errorMessage = error.response
+      ? `Server xatosi (${error.response.status}): ${error.response.data?.message || error.response.statusText}`
+      : error.request
+      ? 'Serverdan javob kelmadi. Internet aloqasini tekshiring.'
+      : `So'rovni sozlashda xato: ${error.message}`;
+   console.error(errorMessage);
   }
 };
 
 const handleExit = () => {
-  router.back();
+  router.push({ path: '/products' });
 };
 
-// Klaviatura tezkor tugmalari
-const handleKeyDown = (event: KeyboardEvent) => {
+const handleKeyDown = (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
     event.preventDefault();
     saveProduct();
@@ -663,7 +710,7 @@ const handleKeyDown = (event: KeyboardEvent) => {
 onMounted(() => {
   fetchDropdownData();
   if (isEditMode.value) {
-    product.id = Number(route.params.id); // ID ni o'rnatish
+    product.id = Number(route.params.id);
     fetchProductData();
   }
   window.addEventListener('keydown', handleKeyDown);
@@ -679,23 +726,23 @@ onUnmounted(() => {
 
 <style scoped>
 .product-form-container {
-  background-color: #F0F2F5; /* Umumiy fon rangi */
+  background-color: #F0F2F5;
 }
 
 .card {
-  border-radius: 0.75rem; /* Border-radiusni oshirish */
-  border: 1px solid #E2E8F0; /* Yengilroq chegara */
+  border-radius: 0.75rem;
+  border: 1px solid #E2E8F0;
 }
 
 .form-section {
   background-color: #FFFFFF;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Yengilroq soya */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
 }
 
 .text-2xl {
-  font-size: 1.75rem; /* Kichikroq sarlavha */
+  font-size: 1.75rem;
 }
 .font-bold {
   font-weight: 700;
@@ -708,6 +755,9 @@ onUnmounted(() => {
 }
 .text-sm {
   font-size: 0.875rem;
+}
+.text-danger {
+  color: #DC3545;
 }
 
 .btn-primary {
@@ -750,8 +800,8 @@ onUnmounted(() => {
   font-size: 0.875rem;
   font-weight: 500;
   color: #4A5568;
-  margin-bottom: 0.5rem; /* Tailwinddan kelgan marginni Bootstrapga moslash */
-  display: block; /* Labelni alohida qatorga o'tkazish */
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .form-control-custom {
@@ -761,22 +811,27 @@ onUnmounted(() => {
   padding: 0.6rem 1rem;
   font-size: 0.95rem;
   color: #2D3748;
-  height: calc(2.4rem + 2px); /* Bootstrap form-controlning standart balandligi */
+  height: calc(2.4rem + 2px);
+}
+
+.form-control-custom[readonly] {
+  background-color: #E9ECEF;
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .form-control-custom:focus {
   border-color: #63B3ED;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5); /* Primary rangga moslash */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
   outline: none;
 }
 
-/* v-select custom styles */
 .custom-v-select.vs--single .vs__dropdown-toggle,
 .custom-v-select.vs--multiple .vs__dropdown-toggle {
   background-color: #F7FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 0.5rem;
-  padding: 0.375rem 1rem; /* Kichikroq padding */
+  padding: 0.375rem 1rem;
   min-height: calc(2.4rem + 2px);
   display: flex;
   align-items: center;
@@ -825,7 +880,7 @@ onUnmounted(() => {
 }
 
 .input-with-button .btn-ellipsis {
-  width: calc(2.4rem + 2px); /* Input balandligiga moslash */
+  width: calc(2.4rem + 2px);
   height: calc(2.4rem + 2px);
   display: flex;
   align-items: center;
@@ -845,7 +900,6 @@ onUnmounted(() => {
   background-color: #E2E8F0;
 }
 
-/* Barcode section */
 .barcode-item {
   display: flex;
   align-items: center;
@@ -853,7 +907,7 @@ onUnmounted(() => {
 }
 
 .barcode-item .form-control-sm {
-  height: calc(1.8rem + 2px); /* Kichikroq input */
+  height: calc(1.8rem + 2px);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   border-radius: 0.375rem;
@@ -867,7 +921,6 @@ onUnmounted(() => {
   border-radius: 0.375rem;
 }
 
-/* Image Upload Section */
 .image-upload-area {
   display: flex;
   flex-direction: column;
@@ -876,7 +929,7 @@ onUnmounted(() => {
 
 .image-placeholder {
   width: 100%;
-  max-width: 300px; /* Rasm joylashadigan maydonning maksimal kengligi */
+  max-width: 300px;
   height: 200px;
   border: 1px solid #E2E8F0;
   border-radius: 0.75rem;
@@ -904,17 +957,17 @@ onUnmounted(() => {
 }
 
 .image-placeholder .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.7); /* Rasmni tanlash uchun ustida turadigan fon */
-    z-index: 5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 5;
 }
 
 .image-placeholder .choose-file-btn {
@@ -940,5 +993,10 @@ onUnmounted(() => {
   text-overflow: ellipsis;
   max-width: 90%;
   margin-top: 0.25rem;
+}
+
+.text-muted {
+  font-size: 0.85em;
+  color: #6c757d;
 }
 </style>

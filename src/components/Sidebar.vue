@@ -80,12 +80,7 @@ export default {
       ],
       malumotMenu: [
         { title: "Mahsulotlar", to: "/products", icon: "bi bi-box" },
-        { title: "Birliklar", to: "/units", icon: "bi bi-slash-square" },
-        { title: "Qo‘shimcha Birliklar", to: "/extraunits", icon: "bi bi-plus-square" },
-        { title: "Brands", to: "/brands", icon: "bi bi-tags" },
-        { title: "Models", to: "/models", icon: "bi bi-grid-3x3-gap" },
-        { title: "Colours", to: "/colours", icon: "bi bi-palette" },
-        { title: "Countrys", to: "/countrys", icon: "bi bi-globe2" },
+        
         { title: "Kurs", to: "/kurs", icon: "bi bi-currency-exchange" },
         { title: "Kontragent", to: "/kontragent", icon: "bi bi-person-lines-fill" },
         { title: "Foydalanuvchi", to: "/users", icon: "bi bi-person" },

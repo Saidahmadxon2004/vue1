@@ -80,6 +80,7 @@ export default {
         case '/kassoviyOrder': return '/kassaOrder/create'
         case '/tolov': return '/addTolov'
         case '/kirim':return '/kirim/create'
+        case '/savdo':return '/rasxod/create'
         default: return ''
       }
     }

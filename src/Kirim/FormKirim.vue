@@ -1,3 +1,4 @@
+
 <template>
   <div class="container-fluid py-4">
     <!-- Sarlavha va Kurs -->
@@ -173,34 +174,34 @@
       <table class="table table-hover table-bordered align-middle enhanced-table">
         <thead class="table-dark sticky-top">
           <tr :style="'display: grid; grid-template-columns:' + width1">
-            <th colspan="4" class="tovar">Товар</th>
-            <th colspan="2" class="kolvo">Сони</th>
-            <th colspan="3" class="kirim">Нарх</th>
-            <th colspan="2" class="kirim">Гарантия</th>
-            <th colspan="2" class="nasenka">Наценка %</th>
-            <th colspan="2" class="sena">Чакана Нарх</th>
-            <th colspan="2" class="sena">Улгуржи Нарх</th>
-            <th></th>
+            <th colspan="4" class="bg-primary bg-opacity-15 text-white text-center">Товар</th>
+            <th colspan="2" class="bg-danger bg-opacity-15 text-white text-center">Сони</th>
+            <th colspan="3" class="bg-success bg-opacity-15 text-white text-center">Нарх</th>
+            <th colspan="2" class="bg-info bg-opacity-15 text-white text-center">Гарантия</th>
+            <th colspan="2" class="bg-warning bg-opacity-15 text-white text-center">Наценка %</th>
+            <th colspan="2" class="bg-primary bg-opacity-15 text-white text-center">Чакана Нарх</th>
+            <th colspan="2" class="bg-primary bg-opacity-15 text-white text-center">Улгуржи Нарх</th>
+            <th class="text-center bg-primary bg-opacity-10"></th>
           </tr>
           <tr :style="'display: grid; grid-template-columns:' + width2">
-            <th v-if="settings[0].view" class="bg-primary">№</th>
-            <th v-if="settings[1].view" class="bg-primary">Штрих код</th>
-            <th v-if="settings[2].view" class="bg-primary">Номи</th>
-            <th v-if="settings[3].view" class="bg-primary">Қолдиқ</th>
-            <th v-if="settings[16].view" class="bg-primary">Пачка</th>
-            <th v-if="settings[4].view" class="bg-primary">Дона</th>
-            <th v-if="settings[17].view" class="bg-primary">Пачка бўйича</th>
-            <th v-if="settings[5].view" class="bg-primary">Дона бўйича</th>
-            <th v-if="settings[7].view" class="bg-primary">Себет</th>
-            <th v-if="settings[6].view" class="bg-primary">Жами сумма</th>
-            <th v-if="settings[8].view" class="bg-primary">Себет сумма</th>
-            <th v-if="settings[9].view" class="bg-primary">Чакана</th>
-            <th v-if="settings[12].view" class="bg-primary">Улгуржи</th>
-            <th v-if="settings[10].view" class="bg-primary">Сўм</th>
-            <th v-if="settings[11].view" class="bg-primary text-success">$</th>
-            <th v-if="settings[13].view" class="bg-primary">Сўм</th>
-            <th v-if="settings[14].view" class="bg-primary text-success">$</th>
-            <th v-if="settings[15].view"></th>
+            <th v-if="settings[0].view" class="bg-primary bg-opacity-15 text-white">№</th>
+            <th v-if="settings[1].view" class="bg-primary bg-opacity-15 text-white">Штрих код</th>
+            <th v-if="settings[2].view" class="bg-primary bg-opacity-15 text-white">Номи</th>
+            <th v-if="settings[3].view" class="bg-primary bg-opacity-15 text-white">Қолдиқ</th>
+            <th v-if="settings[16].view" class="bg-danger bg-opacity-15 text-white">Пачка</th>
+            <th v-if="settings[4].view" class="bg-danger bg-opacity-15 text-white">Дона</th>
+            <th v-if="settings[17].view" class="bg-success bg-opacity-15 text-white">Пачка бўйича</th>
+            <th v-if="settings[5].view" class="bg-success bg-opacity-15 text-white">Дона бўйича</th>
+            <th v-if="settings[7].view" class="bg-success bg-opacity-15 text-white">Себет</th>
+            <th v-if="settings[6].view" class="bg-success bg-opacity-15 text-white">Жами сумма</th>
+            <th v-if="settings[8].view" class="bg-success bg-opacity-15 text-white">Себет сумма</th>
+            <th v-if="settings[9].view" class="bg-warning bg-opacity-15 text-white">Чакана</th>
+            <th v-if="settings[12].view" class="bg-warning bg-opacity-15 text-white">Улгуржи</th>
+            <th v-if="settings[10].view" class="bg-primary bg-opacity-15 text-white">Сўм</th>
+            <th v-if="settings[11].view" class="bg-primary bg-opacity-15 text-success">USD</th>
+            <th v-if="settings[13].view" class="bg-primary bg-opacity-15 text-white">Сўм</th>
+            <th v-if="settings[14].view" class="bg-primary bg-opacity-15 text-success">USD</th>
+            <th v-if="settings[15].view" class="text-center bg-primary bg-opacity-10"></th>
           </tr>
         </thead>
         <tbody>
@@ -210,17 +211,17 @@
             :style="'display: grid; grid-template-columns:' + width2"
             class="table-row"
           >
-            <td v-if="settings[0].view" class="tovar">{{ index + 1 }}</td>
-            <td v-if="settings[1].view" class="tovar">
+            <td v-if="settings[0].view" class="bg-primary bg-opacity-12 text-center">{{ index + 1 }}</td>
+            <td v-if="settings[1].view" class="bg-primary bg-opacity-12">
               <input
                 :disabled="changedisabled"
-                class="form-control form-control-sm"
+                class="form-control form-control-sm text-center"
                 type="text"
                 v-model="item.shtrix_kod"
                 @change="shtrix(index)"
               />
             </td>
-            <td v-if="settings[2].view" class="tovar">
+            <td v-if="settings[2].view" class="bg-primary bg-opacity-12 v-select-cell">
               <v-select
                 :disabled="changedisabled"
                 :clearable="false"
@@ -233,9 +234,7 @@
                 @search="query => (search = query)"
               >
                 <template #list-footer>
-                  <li style="text-align: center; font-weight: bold;">
-                    F4 умумий рўйхат
-                  </li>
+                  <li class="text-center fw-bold">F4 умумий рўйхат</li>
                 </template>
                 <template #selected-option-container="{ option }">
                   <div class="vs__selected">
@@ -271,115 +270,105 @@
                 </template>
               </v-select>
             </td>
-            <td v-if="settings[3].view" class="tovar">{{ formatNumber(item.current_balance, 0) }}</td>
-            <td v-if="settings[16].view" class="kolvo">
+            <td v-if="settings[3].view" class="bg-primary bg-opacity-12 text-center">{{ formatNumber(item.current_balance, 0) }}</td>
+            <td v-if="settings[16].view" class="bg-danger bg-opacity-12">
               <input
                 :disabled="changedisabled"
                 separator="space"
-                style="text-align: center;"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="3"
                 v-model="item.pack_count"
-                class="form-control form-control-sm"
                 @input="changePack(index)"
               />
             </td>
-            <td v-if="settings[4].view" class="kolvo">
+            <td v-if="settings[4].view" class="bg-danger bg-opacity-12">
               <input
                 :disabled="changedisabled"
                 separator="space"
-                style="text-align: center;"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="3"
                 v-model="item.count"
-                class="form-control form-control-sm"
                 @input="changeCount(index)"
               />
             </td>
-            <td v-if="settings[17].view" class="kirim">
-  <input
-    :disabled="changedisabled"
-    separator="space"
-    v-bind:precision="3"
-    style="text-align: center;"
-    v-model="item.pack_price"
-    class="form-control form-control-sm"
-    @input="changePackPrice(index)" 
-  />
-</td>
-            <td v-if="settings[5].view" class="kirim">
+            <td v-if="settings[17].view" class="bg-success bg-opacity-12">
               <input
                 :disabled="changedisabled"
                 separator="space"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="3"
-                style="text-align: center;"
+                v-model="item.pack_price"
+                @input="changePackPrice(index)"
+              />
+            </td>
+            <td v-if="settings[5].view" class="bg-success bg-opacity-12">
+              <input
+                :disabled="changedisabled"
+                separator="space"
+                class="form-control form-control-sm text-center"
+                v-bind:precision="3"
                 v-model="item.kontragent_price"
-                class="form-control form-control-sm"
                 @input="changePrice(index)"
               />
             </td>
-            <td v-if="settings[7].view" class="kirim">{{ formatNumber(item.debit_price, 3) }}</td>
-            <td v-if="settings[6].view" class="kirim">{{ formatNumber(item.kontragent_summa) }}</td>
-            <td v-if="settings[8].view" class="kirim">{{ formatNumber(item.debit_summa) }}</td>
-            <td v-if="settings[9].view" class="nasenka">
+            <td v-if="settings[7].view" class="bg-success bg-opacity-12 text-center">{{ formatNumber(item.debit_price, 3) }}</td>
+            <td v-if="settings[6].view" class="bg-success bg-opacity-12 text-center">{{ formatNumber(item.kontragent_summa) }}</td>
+            <td v-if="settings[8].view" class="bg-success bg-opacity-12 text-center">{{ formatNumber(item.debit_summa) }}</td>
+            <td v-if="settings[9].view" class="bg-warning bg-opacity-12">
               <input
                 type="number"
                 :disabled="changedisabled"
-                style="text-align: center;"
+                class="form-control form-control-sm text-center"
                 v-model="item.chakana_percent"
-                class="form-control form-control-sm"
                 @input="changePercentChakana(index)"
               />
             </td>
-            <td v-if="settings[12].view" class="nasenka">
+            <td v-if="settings[12].view" class="bg-warning bg-opacity-12">
               <input
                 type="number"
                 :disabled="changedisabled"
-                style="text-align: center;"
+                class="form-control form-control-sm text-center"
                 v-model="item.optom_percent"
-                class="form-control form-control-sm"
                 @input="changePercentOptom(index)"
               />
             </td>
-            <td v-if="settings[10].view" class="sena">
+            <td v-if="settings[10].view" class="bg-primary bg-opacity-12">
               <input
                 :disabled="changedisabled"
-                style="text-align: center;"
                 separator="space"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="2"
                 v-model="item.chakana_price"
-                class="form-control form-control-sm"
                 @change="changePriceChakana(index)"
               />
             </td>
-            <td v-if="settings[11].view" class="sena text-success">
+            <td v-if="settings[11].view" class="bg-primary bg-opacity-12 text-success">
               <input
                 :disabled="changedisabled"
-                style="text-align: center; color: green;"
                 separator="space"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="3"
                 v-model="item.chakana_dollar_price"
-                class="form-control form-control-sm"
                 @change="changePriceChakanaDollar(index)"
               />
             </td>
-            <td v-if="settings[13].view" class="sena">
+            <td v-if="settings[13].view" class="bg-primary bg-opacity-12">
               <input
                 :disabled="changedisabled"
-                style="text-align: center;"
                 separator="space"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="2"
                 v-model="item.optom_price"
-                class="form-control form-control-sm"
                 @change="changePriceOptom(index)"
               />
             </td>
-            <td v-if="settings[14].view" class="sena text-success">
+            <td v-if="settings[14].view" class="bg-primary bg-opacity-12 text-success">
               <input
                 :disabled="changedisabled"
-                style="text-align: center; color: green;"
                 separator="space"
+                class="form-control form-control-sm text-center"
                 v-bind:precision="3"
                 v-model="item.optom_dollar_price"
-                class="form-control form-control-sm"
                 @change="changePriceOptomDollar(index)"
               />
             </td>
@@ -396,24 +385,24 @@
         </tbody>
         <tfoot>
           <tr :style="'display: grid; grid-template-columns:' + width2">
-            <th v-if="settings[0].view"></th>
-            <th v-if="settings[1].view"></th>
-            <th v-if="settings[2].view"></th>
-            <th v-if="settings[3].view"></th>
-            <th v-if="settings[16].view"></th>
-            <th v-if="settings[4].view">{{ formatNumber(formData.count_all) }}</th>
-            <th v-if="settings[5].view"></th>
-            <th v-if="settings[17].view"></th>
-            <th v-if="settings[7].view"></th>
-            <th v-if="settings[6].view">{{ formatNumber(formData.summa) }}</th>
-            <th v-if="settings[8].view">{{ formatNumber(formData.prixod_summa) }}</th>
-            <th v-if="settings[9].view"></th>
-            <th v-if="settings[12].view"></th>
-            <th v-if="settings[10].view"></th>
-            <th v-if="settings[11].view"></th>
-            <th v-if="settings[13].view"></th>
-            <th v-if="settings[14].view"></th>
-            <th v-if="settings[15].view"></th>
+            <th v-if="settings[0].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[1].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[2].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[3].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[16].view" class="bg-danger bg-opacity-12"></th>
+            <th v-if="settings[4].view" class="bg-danger bg-opacity-12 text-center">{{ formatNumber(formData.count_all) }}</th>
+            <th v-if="settings[17].view" class="bg-success bg-opacity-12"></th>
+            <th v-if="settings[5].view" class="bg-success bg-opacity-12"></th>
+            <th v-if="settings[7].view" class="bg-success bg-opacity-12"></th>
+            <th v-if="settings[6].view" class="bg-success bg-opacity-12 text-center">{{ formatNumber(formData.summa) }}</th>
+            <th v-if="settings[8].view" class="bg-success bg-opacity-12 text-center">{{ formatNumber(formData.prixod_summa) }}</th>
+            <th v-if="settings[9].view" class="bg-warning bg-opacity-12"></th>
+            <th v-if="settings[12].view" class="bg-warning bg-opacity-12"></th>
+            <th v-if="settings[10].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[11].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[13].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[14].view" class="bg-primary bg-opacity-12"></th>
+            <th v-if="settings[15].view" class="text-center bg-primary bg-opacity-10"></th>
           </tr>
         </tfoot>
       </table>
@@ -474,14 +463,14 @@
     <!-- Сўзлама модали -->
     <div class="modal fade" id="modal-settings" tabindex="-1" aria-labelledby="modal-settings-label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content shadow-sm rounded">
+          <div class="modal-header bg-primary bg-opacity-12">
             <h5 class="modal-title" id="modal-settings-label">Сўзлама</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Ёпиш"></button>
           </div>
           <div class="modal-body">
-            <table class="table table-bordered">
-              <thead>
+            <table class="table table-bordered table-hover">
+              <thead class="table-light">
                 <tr>
                   <th>Номи</th>
                   <th>Кўрсатиш</th>
@@ -512,21 +501,21 @@
     <!-- Штрих модал -->
     <div class="modal fade" id="modal-shtrix" tabindex="-1" aria-labelledby="modal-shtrix-label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content shadow-sm rounded">
+          <div class="modal-header bg-primary bg-opacity-12">
             <h5 class="modal-title" id="modal-shtrix-label">Товар</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Ёпиш"></button>
           </div>
           <div class="modal-body">
             <input
               type="text"
-              class="form-control mb-3"
+              class="form-control mb-3 shadow-sm"
               placeholder="Қидириш"
               v-model="filter"
               ref="shtrixSearch"
             />
             <table class="table table-bordered table-hover">
-              <thead>
+              <thead class="table-light">
                 <tr>
                   <th>№</th>
                   <th>Номи</th>
@@ -595,11 +584,11 @@
       </div>
     </div>
 
-    <!-- Ётказувчи модал (тахминан) -->
+    <!-- Ётказувчи модал -->
     <div class="modal fade" id="modal-kontragent" tabindex="-1" aria-labelledby="modal-kontragent-label" aria-hidden="true">
       <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content shadow-sm rounded">
+          <div class="modal-header bg-primary bg-opacity-12">
             <h5 class="modal-title" id="modal-kontragent-label">Янги ётказувчи</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Ёпиш"></button>
           </div>
@@ -607,7 +596,7 @@
             <input
               type="text"
               v-model="kontragent.name"
-              class="form-control"
+              class="form-control shadow-sm"
               placeholder="Номи"
             />
           </div>
@@ -619,11 +608,11 @@
       </div>
     </div>
 
-    <!-- Ётказувчилар рўйхати модал (тахминан) -->
+    <!-- Ётказувчилар рўйхати модал -->
     <div class="modal fade" id="modal-kontragentlist" tabindex="-1" aria-labelledby="modal-kontragentlist-label" aria-hidden="true">
       <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content shadow-sm rounded">
+          <div class="modal-header bg-primary bg-opacity-12">
             <h5 class="modal-title" id="modal-kontragentlist-label">Ётказувчилар рўйхати</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Ёпиш"></button>
           </div>
@@ -634,11 +623,11 @@
       </div>
     </div>
 
-    <!-- Тўлов турлари рўйхати модал (тахминан) -->
+    <!-- Тўлов турлари рўйхати модал -->
     <div class="modal fade" id="modal-paytypelist" tabindex="-1" aria-labelledby="modal-paytypelist-label" aria-hidden="true">
       <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content shadow-sm rounded">
+          <div class="modal-header bg-primary bg-opacity-12">
             <h5 class="modal-title" id="modal-paytypelist-label">Тўлов турлари рўйхати</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Ёпиш"></button>
           </div>
@@ -651,12 +640,162 @@
   </div>
 </template>
 
+<style scoped>
+/* General container styling */
+.container-fluid {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* v-select positioning fix */
+.v-select-cell {
+  position: relative;
+  padding: 0.5rem;
+}
+
+.v-select-cell .vs__dropdown-toggle {
+  border: none;
+  background: white;
+  padding: 0;
+}
+
+.v-select-cell .vs__dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 0.25rem;
+  /* box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); */
+  background-color: #fff;
+}
+
+.v-select-cell .vs__selected {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.v-select-cell .vs__search {
+  height: calc(1.5em + 0.5rem + 2px);
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.v-select-cell .modallist {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Table styling */
+.table-responsive {
+  max-height: calc(100vh - 325px);
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.enhanced-table th,
+.enhanced-table td {
+  border: 1px solid #dee2e6;
+  padding: 0.5rem;
+  text-align: center;
+  vertical-align: middle;
+  transition: background-color 0.3s ease;
+}
+
+.enhanced-table th {
+  /* background: linear-gradient(135deg, #343a40, #495057); */
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.enhanced-table .table-row:hover {
+  background-color: #e9ecef;
+}
+
+/* Form controls */
+.form-control-sm,
+.btn-sm {
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+}
+
+.form-control-sm {
+  padding: 0.25rem 0.5rem;
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal styling */
+.modal-content {
+  border-radius: 0.5rem;
+  border: none;
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.75rem;
+  }
+  .form-control-sm,
+  .vs__search,
+  .btn-sm {
+    font-size: 0.75rem;
+  }
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+}
+
+/* Text success for USD columns */
+.text-success {
+  color: #28a745 !important;
+}
+
+/* Sticky header */
+.sticky-top {
+  z-index: 10;
+}
+
+/* Additional styling for modallist and pluss buttons */
+.modallist,
+.pluss {
+  margin-left: 0.25rem;
+}
+</style>
+
+
 <script>
-import { defineComponent, ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue';
+import { defineComponent, ref, reactive,watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
-import vSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css';
 import axios from 'axios';
 import mitt from 'mitt';
 // import VueNumeric from 'vue-numeric';
@@ -678,6 +817,13 @@ export default defineComponent({
 
     // Reaktiv ma'lumotlar
     const formData = reactive({ ...props.datas });
+     watch(
+    () => props.datas,
+    (newVal) => {
+      Object.assign(formData, newVal);
+    },
+    { deep: true, immediate: true }
+  );
     const settings = ref([
       { column: '№', width: 70, view: true },
       { column: 'shtrix_kod', width: 120, view: true },
@@ -1351,95 +1497,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-.table-responsive {
-  max-height: calc(100vh - 325px);
-  overflow-y: auto;
-  overflow-x: auto;
-}
-
-.enhanced-table th,
-.enhanced-table td {
-  border: 2px solid #3498db; /* Чуқур чекиш */
-  padding: 8px;
-  text-align: center;
-  vertical-align: middle;
-  background: linear-gradient(135deg, #ffffff, #ecf0f1); /* Градиент фон */
-  transition: background-color 0.3s ease;
-}
-
-.enhanced-table th {
-  background: linear-gradient(135deg, #2c3e50, #34495e); /* Тўғридан-тўғри қўлқоп градиент */
-  color: white;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.enhanced-table .table-row:hover {
-  background: linear-gradient(135deg, #d5f4e6, #ffffff); /* Ёғон ховер эффекти */
-}
-
-.tovar,
-.kolvo,
-.kirim,
-.nasenka,
-.sena {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.form-control-sm,
-.btn-sm {
-  font-size: 0.85rem;
-}
-
-.shadow-sm {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn {
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.modallist,
-.pluss {
-  margin-left: 5px;
-}
-
-.text-success {
-  color: #27ae60 !important;
-}
-/* Jadval ustun ranglarini */
-.enhanced-table .tovar {
-  background-color: #cfe2ff; /* ko‘k */
-}
-.enhanced-table .kolvo {
-  background-color: #f8d7da; /* qizil */
-}
-.enhanced-table .kirim {
-  background-color: #d1e7dd; /* yashil */
-}
-.enhanced-table .nasenka {
-  background-color: #cff4fc; /* och ko‘k */
-}
-.enhanced-table .sena {
-  background-color: #ffe5b4; /* to‘q sariq */
-}
-
-/* Inputlarni markazlashtirish */
-.enhanced-table input.form-control-sm {
-  text-align: center;
-}
-
-/* Jadval hover uchun */
-.enhanced-table tbody tr:hover {
-  background-color: #f0f0f0;
-}
-
-</style>

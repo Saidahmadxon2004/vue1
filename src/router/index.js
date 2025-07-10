@@ -48,6 +48,7 @@ import KirimCreate from '@/Kirim/KirimCreate.vue'
 import KirimUpdate from '@/Kirim/KirimUpdate.vue'
 import TolovCreate from '@/Tolov/TolovCreate.vue'
 import TolovUpdate from '@/Tolov/TolovUpdate.vue'
+// import RasxodCreate from '@/Rasxod/RasxodCreate.vue'
 
 
 
@@ -287,7 +288,12 @@ const routes = [
     path: '/tolov/update/:id',
     name: 'TolovUpdate',
     component: TolovUpdate
-  }
+  },
+  // {
+  //   path: '/rasxod/create/',
+  //   name: 'rasxodCreate',
+  //   component: RasxodCreate
+  // }
 
 
 ]

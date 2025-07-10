@@ -2,7 +2,7 @@
   <extra-form :datas="KirimData"></extra-form>
 </template>
 <script>
-  import ExtraForm from "./FormKirim.vue"
+  import ExtraForm from "./FormRasxod.vue"
   export default {
   components: {ExtraForm},
     data() {
@@ -32,8 +32,6 @@
       kontragent_price: 5000,
       kontragent_summa: 50000,
       chakana_percent: 10,
-
-      
       optom_percent: 5,
       chakana_price: 5500,
       optom_price: 5250,
