@@ -304,9 +304,7 @@ export default {
     this.showAsosModal = false;
   },
 
-  // =====================
-  // 🔥 Saqlash
-  // =====================
+  
   Send() {
     let url = this.$route.params.id
       ? `/api/v1/kassa-order/id/${this.$route.params.id}`
@@ -360,6 +358,7 @@ html, body, #app {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  max-width: 1600px;
   border-radius: 8px; 
 }
 
@@ -418,7 +417,7 @@ html, body, #app {
   flex-direction: column;
   justify-content: flex-start; 
   box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-  min-height: 90px; /* Minimal balandlikni saqlash */
+  min-height: 90px; 
 }
 
 
