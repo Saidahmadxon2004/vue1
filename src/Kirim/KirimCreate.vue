@@ -12,7 +12,7 @@ export default {
     const datas = reactive({
       created_at: Math.floor(Date.now() / 1000),
       updated_at: Math.floor(Date.now() / 1000),
-      sklad_id: 3,
+      sklad_id: 1,
       kontragent_id: 1,
       pay_type_id: 1,
       rasxod_summa: 0.00,

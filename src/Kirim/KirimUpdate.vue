@@ -10,7 +10,7 @@
         'KirimData': {      
   created_at: Math.floor(Date.now() / 1000),
   updated_at: Math.floor(Date.now() / 1000),
-  sklad_id: 2,
+  sklad_id: 1,
   kontragent_id: 1,
   pay_type_id: 1,
   rasxod_summa: 0.00,
@@ -60,6 +60,7 @@
         }).then(function (response) {
           self.KirimData = response.data;
           console.log(self.KirimData)
+          console.log(response.data)
         });
       },
     }

@@ -20,7 +20,7 @@
           <tr v-for="(item, index) in tolovlar" :key="index">
             <td>{{ item.id }}</td>
             <td>{{ item.user?.first_name }}</td>
-            <td>{{ item.datetime }}</td>
+            <td>{{Dates(item.datetime) }}</td>
             <td>{{ item.sklad?.name }}</td>
             <td>{{ item.pay_type?.name }}</td>
             <td>{{ item.kontragent?.name }}</td>
@@ -61,6 +61,44 @@ export default {
     }
   },
   methods: {
+     Dates(date) {
+      var d = new Date(date * 1000);
+      var dt = d.getDate();
+      var month = d.getMonth() + 1;
+      if (dt < 10) {
+        dt = "0" + dt;
+      }
+      if (month < 10) {
+        month = "0" + month;
+      }
+      var sec = d.getSeconds();
+      if (sec < 10) {
+        sec = "0" + sec;
+      }
+      var min = d.getMinutes();
+      if (min < 10) {
+        min = "0" + min;
+      }
+      var hour = d.getHours();
+      if (hour < 10) {
+        hour = "0" + hour;
+      }
+      return (
+        dt +
+        "-" +
+        month +
+        "-" +
+        d.getFullYear() +
+        " " +
+        hour +
+        ":" +
+        min +
+        ":" +
+        sec
+      );
+    },
+  
+    
     async deleteElement(id) {
       try {
         await this.$axios.delete(`/api/v1/kontragent-pay/id/${id}`);

@@ -63,6 +63,7 @@ export default {
         price_retail_usd: product.price_retail_usd || 0,
         price_wholesale_usd: product.price_wholesale_usd || 0,
       })).sort((a, b) => a.id - b.id);
+      console.log(res.data)
     } catch (err) {
       console.error('Yuklashda xatolik:', err);
     }

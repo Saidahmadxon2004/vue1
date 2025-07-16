@@ -11,18 +11,18 @@ import moment from 'moment';
       return {
         'datas': 
           {
-  datetime: 1619509349,
+  datetime: Math.floor(Date.now() / 1000),
   sklad_id: 1,
   kontragent_id: 1,
   pay_type_id: 1,
-  summa: 10000,
-  current_total: 20000,
+  summa: 0,
+  current_total: 0,
   type: true,
-  comment: "to'lov",
+  comment: "",
   number: null,
   dollar_rate: 1,
   pay_type_kassa: 2,
-  kassa_summa: 1000,
+  kassa_summa: 0,
   current_total_dollar: 2,
   user_id: 1,
   z_report: false,

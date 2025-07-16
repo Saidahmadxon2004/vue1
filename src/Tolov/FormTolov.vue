@@ -18,7 +18,7 @@
     <div class="row">
       <div class="col-md-6">
         <div class="mb-3">
-          <label for="warehouse" class="form-label">Склад</label>
+          <label for="warehouse" class="form-label">Склад <span class="text-danger">*</span></label>
           <v-select
             id="warehouse"
             v-model="formData.sklad_id"
@@ -37,7 +37,7 @@
         <div class="card p-3 mb-3 border-light bg-light">
           <h6>Контрагент</h6>
           <div class="mb-3">
-            <label for="counterparty" class="form-label">Контрагент</label>
+            <label for="counterparty" class="form-label">Контрагент <span class="text-danger">*</span></label>
             <div class="input-group">
               <v-select
                 id="counterparty"
@@ -47,15 +47,15 @@
                 label="name"
                 placeholder="Контрагентни танланг..."
                 required
-                :class="{'is-invalid': !formData.counterparty_id && formSubmitted}"
+                :class="{'is-invalid': !formData.counterparty_id && formSubmitted, 'custom-vs-select': true}"
                 @update:modelValue="handleKontragentSelectChange"
-                :filterable="false"
+                :filterable="true"
               >
-                 <template #selected-option="{ name }">
-                    {{ name }}
+                <template #selected-option="{ name }">
+                  {{ name }}
                 </template>
                 <template #no-options>
-                    Контрагент топилмади.
+                  Контрагент топилмади.
                 </template>
               </v-select>
               <button class="btn btn-outline-secondary btn-more" type="button" @click="showKontragentSelectModal = true">
@@ -77,7 +77,7 @@
             />
           </div>
           <div class="mb-3">
-            <label for="paymentType" class="form-label">Тўлов тури</label>
+            <label for="paymentType" class="form-label">Тўлов тури <span class="text-danger">*</span></label>
             <v-select
               id="paymentType"
               v-model="formData.payment_type_id"
@@ -104,7 +104,7 @@
             />
           </div>
           <div class="mb-3">
-            <label for="paymentTime" class="form-label">Тўлов вақти</label>
+            <label for="paymentTime" class="form-label">Тўлов вақти <span class="text-danger">*</span></label>
             <input
               type="date"
               id="paymentTime"
@@ -127,7 +127,7 @@
 
       <div class="col-md-6">
         <div class="mb-3">
-          <label for="type" class="form-label">Тури</label>
+          <label for="type" class="form-label">Тури <span class="text-danger">*</span></label>
           <select id="type" v-model="formData.transaction_type" class="form-select" required>
             <option value="income">Кирим</option>
             <option value="expense">Чиқим</option>
@@ -188,6 +188,7 @@
                 @input="updateTotalAmount"
               />
             </div>
+
             <div class="col-md-6 mb-3">
               <label for="changeDollar" class="form-label">Қайтйм $</label>
               <input
@@ -225,22 +226,18 @@
 
 <script>
 import moment from 'moment';
-import vSelect from 'vue-select';
+import Vue3Select from 'vue3-select';
 import 'vue-select/dist/vue-select.css';
-import TolovModal from './TolovModal.vue'; 
+import TolovModal from './TolovModal.vue';
 
 export default {
   components: {
-    vSelect,
+   Vue3Select,
     TolovModal,
   },
   props: {
     datasend: {
       type: Object,
-
-
-
-
       default: () => ({
         sklad_id: null,
         counterparty_id: null,
@@ -308,28 +305,21 @@ export default {
 
       if (this.formData.payment_type_id === this.dollarPaymentTypeId) {
         if (rate !== 0) {
-            cashSumConverted = cashSum / rate;
-            plasticConverted = plastic / rate;
-            transferConverted = transfer / rate;
-            changeSumConverted = changeSum / rate;
+          cashSumConverted = cashSum / rate;
+          plasticConverted = plastic / rate;
+          transferConverted = transfer / rate;
+          changeSumConverted = changeSum / rate;
         } else {
-            cashSumConverted = 0;
-            plasticConverted = 0;
-            transferConverted = 0;
-            changeSumConverted = 0;
+          cashSumConverted = plasticConverted = transferConverted = changeSumConverted = 0;
         }
-
         total = (cashDollarConverted + cashSumConverted + plasticConverted + transferConverted) -
                 (changeDollarConverted + changeSumConverted);
-
         return parseFloat(total.toFixed(2));
       } else {
         cashDollarConverted = cashDollar * rate;
         changeDollarConverted = changeDollar * rate;
-
         total = (cashDollarConverted + cashSumConverted + plasticConverted + transferConverted) -
                 (changeDollarConverted + changeSumConverted);
-
         return parseFloat(total.toFixed(0));
       }
     }
@@ -351,6 +341,11 @@ export default {
       deep: true,
       immediate: true,
     },
+    'formData.dollar_rate': {
+      handler() {
+        this.updateTotalAmount();
+      }
+    },
     calculatedTotalAmount: {
       handler(newVal) {
         this.formData.amount = newVal;
@@ -367,8 +362,14 @@ export default {
     this.fetchWarehouses();
     this.fetchPaymentTypes();
     this.fetchKontragents();
+    this.fetchLatestDollarRate();
   },
   methods: {
+     async handleKontragentSelection(kontragentId) {
+    await this.fetchKontragentBalance(kontragentId);
+    await this.fetchKontragentNameById(kontragentId);
+    this.formData.counterparty_id = kontragentId;
+  },
     async fetchWarehouses() {
       try {
         const response = await this.$axios.get('/api/v1/sklads/skladnames');
@@ -389,89 +390,104 @@ export default {
         if (dollarType) {
           this.dollarPaymentTypeId = dollarType.id;
         }
-
-        const naqdType = this.paymentTypes.find(type => type.name === 'Нақд');
-        if (this.paymentTypes.length > 0 && !this.formData.payment_type_id) {
-          this.formData.payment_type_id = naqdType ? naqdType.id : this.paymentTypes[0].id;
-        }
-        this.updateTotalAmount();
       } catch (error) {
         console.error('Error fetching payment types:', error);
         alert('Тўлов турларини юклашда хатолик юз берди.');
       }
     },
     async fetchKontragents() {
-        try {
-            const response = await this.$axios.get('/api/v1/kontragent');
-            this.kontragents = response.data;
-        } catch (error) {
-            console.error('Error fetching kontragents:', error);
-            alert('Контрагентларни юклашда хатолик юз берди.');
-        }
-    },
+      try {
+        const response = await this.$axios.get('/api/v1/kontragent');
+        this.kontragents = response.data;
+      } catch (error) {
+        console.error('Error fetching kontragents:', error);
+        alert('Контрагентларни юклашда хатолик юз берди.');
+      }
+    },async fetchKontragentBalance(kontragentId) {
+  const self = this;
+  if (!kontragentId) {
+    this.formData.balance_usd = 0;
+    this.formData.balance_uzs = 0;
+    return;
+  }
+  try {
+    const response = await this.$axios({
+      method: "post",
+      url: "/api/v1/kontragent/total",
+      data: {
+        kontragent_id: kontragentId,
+        sklad_id: self.formData.sklad_id,
+        datetime: moment(self.formData.payment_date, "YYYY-MM-DD").unix()
+      }
+    });
+
+    // Default balanslarni nolga qo'yib chiqamiz
+    this.formData.balance_usd = 0;
+    this.formData.balance_uzs = 0;
+
+    response.data.forEach(element => {
+      if (element.pay_type_id === 3) {
+        this.formData.balance_usd = parseFloat(element.total.toFixed(3));
+      } else {
+        this.formData.balance_uzs += parseFloat(element.total.toFixed(3));
+      }
+    });
+
+  } catch (error) {
+    console.error("Kontragent balansi olishda xatolik:", error);
+    alert("Kontagent balansini olishda xatolik yuz berdi.");
+    this.formData.balance_usd = 0;
+    this.formData.balance_uzs = 0;
+  }
+},
+
     async fetchKontragentNameById(kontragentId) {
-        if (!kontragentId) {
-            this.formData.counterparty_name = '';
-            return;
-        }
-        const kontragent = this.kontragents.find(k => k.id === kontragentId);
-        if (kontragent) {
-            this.formData.counterparty_name = kontragent.name;
-        } else {
-            try {
-                const response = await this.$axios.get(`/api/v1/kontragent/id/${kontragentId}`);
-                if (response.data && response.data.data) {
-                    this.formData.counterparty_name = response.data.data.name;
-                    // Add to kontragents list if not already there
-                    if (!this.kontragents.some(k => k.id === kontragentId)) {
-                        this.kontragents.push(response.data.data);
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching kontragent name by ID:', error);
-                this.formData.counterparty_name = 'Номаълум Контрагент';
-            }
-        }
-    },
-    handleWarehouseChange(selectedOption) {
-    },
-    handlePaymentTypeChange(selectedOption) {
-      this.updateTotalAmount();
-    },
-    handleKontragentSelection(selectedKontragent) {
-      this.formData.counterparty_id = selectedKontragent.id;
-      this.formData.counterparty_name = selectedKontragent.name;
-      this.fetchKontragentBalance(selectedKontragent.id);
-      this.showKontragentSelectModal = false;
-    },
-    handleKontragentSelectChange(selectedKontragentId) {
-        if (selectedKontragentId) {
-            this.fetchKontragentBalance(selectedKontragentId);
-            this.fetchKontragentNameById(selectedKontragentId);
-        } else {
-            this.formData.counterparty_name = '';
-            this.formData.balance_usd = 0;
-            this.formData.balance_uzs = 0;
-        }
-    },
-    async fetchKontragentBalance(kontragentId) {
       if (!kontragentId) {
-        this.formData.balance_usd = 0;
-        this.formData.balance_uzs = 0;
+        this.formData.counterparty_name = '';
         return;
       }
-      try {
-        const response = await this.$axios.get(`/api/v1/kontragent/${kontragentId}/balance`);
-        this.formData.balance_usd = response.data.usd_balance || 0;
-        this.formData.balance_uzs = response.data.uzs_balance || 0;
-      } catch (error) {
-        console.error("Kontragent balansi olinmadi:", error);
+      const kontragent = this.kontragents.find(k => k.id === kontragentId);
+      if (kontragent) {
+        this.formData.counterparty_name = kontragent.name;
+      } else {
+        try {
+          const response = await this.$axios.get(`/api/v1/kontragent/id/${kontragentId}`);
+          if (response.data && response.data.data) {
+            this.formData.counterparty_name = response.data.data.name;
+            if (!this.kontragents.some(k => k.id === kontragentId)) {
+              this.kontragents.push(response.data.data);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching kontragent name by ID:', error);
+          this.formData.counterparty_name = 'Номаълум Контрагент';
+        }
+      }
+    },
+    async handleKontragentSelectChange(selectedKontragentId) {
+      if (selectedKontragentId) {
+        await this.fetchKontragentBalance(selectedKontragentId);
+        await this.fetchKontragentNameById(selectedKontragentId);
+      } else {
+        this.formData.counterparty_name = '';
         this.formData.balance_usd = 0;
         this.formData.balance_uzs = 0;
-        alert('Контрагент балансини олишда хатолик юз берди.');
+      }
+    },
+    async fetchLatestDollarRate() {
+      try {
+        const response = await this.$axios.get('/api/v1/dollar-exchange-rate/last');
+        if (response.data && response.data.rate) {
+          this.formData.dollar_rate = response.data.rate;
+        }
+      } catch (error) {
+        console.error("Error fetching dollar exchange rate:", error);
+        alert('Доллар курсини юклашда хатолик юз берди. Дефолт курс ишлатилади.');
       }
     },
     updateTotalAmount() {
+      // Trigger recompute
+      this.formData.amount = this.calculatedTotalAmount;
     },
     async send() {
       this.formSubmitted = true;
@@ -485,27 +501,25 @@ export default {
 
       const sanitizedData = {
         datetime: moment(this.formData.payment_date).unix(),
-    sklad_id: this.formData.sklad_id,
-    kontragent_id: this.formData.counterparty_id,
-    pay_type_id: this.formData.payment_type_id,
-    summa: this.calculatedTotalAmount,
-    current_total: parseFloat(this.formData.balance_uzs) || 0,
-    type: this.formData.transaction_type === 'income',
+        sklad_id: this.formData.sklad_id,
+        kontragent_id: this.formData.counterparty_id,
+        pay_type_id: this.formData.payment_type_id,
+        summa: this.calculatedTotalAmount,
+        current_total: parseFloat(this.formData.balance_uzs) || 0,
+        type: this.formData.transaction_type === 'income',
 
-    comment: this.formData.comment || '',
-    number: null,
-    dollar_rate: this.formData.dollar_rate || 1,
-    pay_type_kassa: this.formData.payment_type_id || 1,
-    kassa_summa: this.formData.cash_sum || 0,
-    current_total_dollar: parseFloat(this.formData.balance_usd) || 0,
-
-    z_report: false,
-    dollar_summa: this.formData.cash_dollar || 0,
-    cash_summa: this.formData.cash_sum || 0,
-    plastic_summa: this.formData.plastic || 0,
-    shot_summa: this.formData.transfer || 0,
-    qaytim_dollar: this.formData.change_dollar || 0,
-    qaytim_som: this.formData.change_sum || 0
+        comment: this.formData.comment || '',
+        dollar_rate: this.formData.dollar_rate || 1,
+        pay_type_kassa: this.formData.payment_type_id || 1,
+        kassa_summa: this.formData.cash_sum || 0,
+        current_total_dollar: parseFloat(this.formData.balance_usd) || 0,
+        z_report: false,
+        dollar_summa: this.formData.cash_dollar || 0,
+        cash_summa: this.formData.cash_sum || 0,
+        plastic_summa: this.formData.plastic || 0,
+        shot_summa: this.formData.transfer || 0,
+        qaytim_dollar: this.formData.change_dollar || 0,
+        qaytim_som: this.formData.change_sum || 0
       };
 
       if (this.$route.params.id) {
@@ -515,103 +529,88 @@ export default {
 
       try {
         await this.$axios({
-          method: method,
-          url: url,
+          method,
+          url,
           data: sanitizedData,
         });
         this.$router.push({ path: '/tolov' });
         alert('Тўлов муваффақиятли сақланди!');
       } catch (error) {
-        if (error.response) {
-          console.error('Xato javob:', error.response.data);
-          let errorMessage = "Xato: Ma'lumotlarni yuborishda muammo yuz berdi.";
-          if (error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
-            errorMessage += "\nDetallar:\n";
-            error.response.data.errors.forEach(err => {
-              errorMessage += `- ${err.msg} (Maydon: ${err.param})\n`;
-            });
-          } else if (error.response.data && error.response.data.message) {
-              errorMessage = "Xato: " + error.response.data.message;
-          }
-          alert(errorMessage);
-        } else if (error.request) {
-          console.error('Сервердан жавоб келмади:', error.request);
-          alert('Xato: Серверга уланишда муаммо юз берди. Илтиmos, интернет уланишингизни текширинг.');
-        } else {
-          console.error('Сўров хатоси:', error.message);
-          alert('Xato: Сўров юборишда хатолик юз берди.');
-        }
+        console.error("Xato:", error);
+        alert("Тўловни сақлашда хатолик юз берди.");
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
-<style>
-/* Base Styles for a clean look */
+
+<style scoped>
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5; /* Light gray background */
+  background-color: #F5F7FA;
   color: #333;
 }
 
 .card {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 2rem auto;
   border: none;
   border-radius: 12px;
-  background-color: #ffffff; /* White card background */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Soft shadow */
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2rem; /* ichki joy keng */
 }
 
 .card-header {
-  background-color: #f7f9fc; /* Light header background */
+  background-color: #f7f9fc;
   border-bottom: 1px solid #e0e0e0;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.5rem;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
 }
 
 h5 {
-  color: #2c3e50; /* Darker heading color */
+  color: #2c3e50;
   font-weight: 600;
+  font-size: 1.25rem;
 }
 
 .form-label {
   font-weight: 500;
   color: #555;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
-.form-control, .form-select, .vs__search, .vs__selected, .vs__dropdown-toggle {
+.form-control,
+.form-select {
   border-radius: 8px;
-  border: 1px solid #dcdcdc; /* Light border for inputs */
-  padding: 0.75rem 1rem;
+  border: 1px solid #dcdcdc;
+  padding: 0.65rem 0.85rem;
   font-size: 0.95rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
   background-color: #fdfdfd;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-control:focus, .form-select:focus, .vs__search:focus, .vs__dropdown-toggle:focus-within {
-  border-color: #a7d9f7; /* Soft blue on focus */
-  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25); /* Adjusted focus shadow */
+.form-control:focus,
+.form-select:focus {
+  border-color: #6a96e8;
+  box-shadow: 0 0 0 0.2rem rgba(106, 150, 232, 0.2);
   outline: none;
 }
 
-/* Specific styles for vue-select */
-.vs--single .vs__selected-options {
-  padding-left: 0.75rem;
+/* V-Select styles */
+.v-select .vs__dropdown-toggle {
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  padding: 0.5rem 0.75rem;
+  background-color: #fdfdfd;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.vs__dropdown-toggle {
-  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
-  height: auto;
-  min-height: 44px;
-}
-
-.vs__search::placeholder,
-.vs__dropdown-toggle .vs__selected {
-  color: #888;
+.v-select.vs--open .vs__dropdown-toggle {
+  border-color: #6a96e8;
+  box-shadow: 0 0 0 0.2rem rgba(106, 150, 232, 0.2);
 }
 
 .vs__dropdown-menu {
@@ -623,87 +622,105 @@ h5 {
 }
 
 .vs__option {
-  padding: 0.75rem 1rem;
+  padding: 0.65rem 0.85rem;
   color: #333;
 }
 
 .vs__option--highlight {
-  background-color: #e6f7ff; /* Light blue for highlight */
-  color: #2c3e50;
+  background-color: #e6f7ff;
 }
 
 .vs__option--selected {
-  background-color: #d1ecf1; /* Slightly darker blue for selected */
-  color: #2c3e50;
+  background-color: #d1ecf1;
 }
 
-/* Action buttons */
+/* Input group tweaks */
+.input-group .v-select.custom-vs-select .vs__dropdown-toggle {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.input-group .btn-more {
+  background-color: #f0f0f0;
+  border-color: #dcdcdc;
+  color: #666;
+  width: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Button tweaks */
 .btn {
   border-radius: 8px;
-  padding: 0.75rem 1.25rem;
+  padding: 0.6rem 1.2rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.2s;
 }
 
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Colors */
 .btn-primary {
-  background-color: #4CAF50; /* Green */
+  background-color: #4CAF50;
   border-color: #4CAF50;
 }
 
 .btn-primary:hover {
-  background-color: #45a049;
-  border-color: #45a049;
+  background-color: #43A047;
 }
 
 .btn-outline-secondary {
-  border-color: #b0c4de; /* Light steel blue */
-  color: #5d6d7e;
+  border-color: #90A4AE;
+  color: #546E7A;
 }
 
 .btn-outline-secondary:hover {
-  background-color: #e6f2ff;
-  color: #465a6b;
-  border-color: #b0c4de;
+  background-color: #CFD8DC;
 }
 
 .btn-danger {
-  background-color: #e74c3c; /* Red */
-  border-color: #e74c3c;
+  background-color: #F44336;
+  border-color: #F44336;
 }
 
 .btn-danger:hover {
-  background-color: #c0392b;
-  border-color: #c0392b;
+  background-color: #E53935;
 }
 
-.btn-more {
-  background-color: #f0f0f0;
-  border-color: #dcdcdc;
-  color: #666;
-  width: 44px; /* Fixed width for the button */
-  flex-shrink: 0; /* Prevent it from shrinking */
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  font-weight: bold;
-  font-size: 1.2rem;
-}
-
-.btn-more:hover {
-  background-color: #e0e0e0;
-}
-
-/* Invalid feedback for validation */
+/* Validation feedback */
 .is-invalid {
   border-color: #e74c3c !important;
 }
 
 .invalid-feedback {
   color: #e74c3c;
-  font-size: 0.875em;
-  margin-top: 0.25rem;
+  font-size: 0.85rem;
+}
+
+/* Spacing tweaks to fit page */
+.row > div {
+  margin-bottom: 1rem;
+}
+
+/* Responsive padding & margin */
+@media (max-width: 768px) {
+  .card {
+    margin: 1rem;
+    padding: 1.2rem;
+  }
+}
+
+/* Ensure page top & bottom margin */
+body {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 </style>

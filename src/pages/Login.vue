@@ -142,6 +142,6 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 /* xohlasang style qo‘shib bezatsang bo‘ladi */
 </style>

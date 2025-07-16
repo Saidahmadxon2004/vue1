@@ -1,4 +1,7 @@
+
+
 <template>
+  <!-- The template remains unchanged to preserve the design -->
   <div class="container-fluid py-4 app-bg">
     <div class="row align-items-center mb-4 header-section">
       <div class="col-md-6">
@@ -667,7 +670,7 @@
 </template>
 
 <style scoped>
-/* Body and general layout */
+/* The CSS remains unchanged to preserve the design */
 .app-bg {
   background-color: #f0f2f5;
   min-height: 100vh;
@@ -675,7 +678,6 @@
   color: #333;
 }
 
-/* Section cards */
 .header-section, .form-section, .bottom-section {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -690,7 +692,6 @@
   border: 1px solid #dcdcdc;
 }
 
-/* Typography */
 .app-title {
   color: #007bff;
   font-size: 1.8rem;
@@ -708,7 +709,6 @@
   font-size: 0.9rem;
 }
 
-/* Inputs & v-selects */
 .app-input, .app-textarea, .app-select .vs__dropdown-toggle {
   border: 1px solid #ced4da;
   border-radius: 0.375rem;
@@ -730,7 +730,6 @@
   cursor: not-allowed;
 }
 
-/* V-select adjustments */
 .vs__dropdown-toggle {
   display: flex;
   align-items: center;
@@ -775,10 +774,8 @@
 .vs__dropdown-option--highlight { background-color: #f0f2f5; }
 .vs__dropdown-option--selected { background-color: #e9ecef; }
 
-/* Fix v-select inside table */
 .v-select-cell { position: relative; overflow: visible !important; z-index: 1; }
 
-/* Table container: enables scroll */
 .app-table-container {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
@@ -787,15 +784,13 @@
   overflow-x: auto;
 }
 
-/* Table itself */
 .data-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  min-width: 1200px; /* large tables will scroll horizontally */
+  min-width: 1200px;
 }
 
-/* Table headers */
 .table-header-group th {
   padding: 0.75rem;
   text-align: left;
@@ -815,7 +810,6 @@
 .header-category-5, .sub-header-5 { background-color: #e08e0b; }
 .header-category-6, .sub-header-6 { background-color: #e08e0b; }
 
-/* Table cells */
 .table-row-item td {
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid #e9ecef;
@@ -825,14 +819,12 @@
   text-overflow: ellipsis;
 }
 
-/* Cell background colors by group */
 .cell-group-1 { background-color: #eaf2fa; }
 .cell-group-2 { background-color: #fde2e2; }
 .cell-group-3 { background-color: #edf8ed; }
 .cell-group-4 { background-color: #e7f6f9; }
 .cell-group-5, .cell-group-6 { background-color: #fff6e9; }
 
-/* Table footer */
 .footer-cell {
   padding: 0.75rem;
   font-weight: 600;
@@ -840,14 +832,12 @@
   border-right: 1px solid #e9ecef;
 }
 
-/* Inputs inside table cells */
 .table-input, .table-select .vs__dropdown-toggle {
   height: 32px;
   font-size: 0.85rem;
   padding: 0.3rem 0.6rem;
 }
 
-/* Links inside table */
 .table-link {
   font-size: 0.9rem;
   color: #007bff;
@@ -855,7 +845,6 @@
 }
 .table-link:hover { text-decoration: underline; }
 
-/* Buttons */
 .action-btn {
   font-size: 0.9rem;
   padding: 0.5rem 1rem;
@@ -871,7 +860,6 @@
 .mini-btn { padding: 0.2rem 0.5rem; font-size: 0.75rem; border-radius: 0.3rem; }
 .delete-btn { padding: 0.3rem 0.6rem; }
 
-/* Modal */
 .app-modal-content {
   border-radius: 0.75rem;
   box-shadow: 0 8px 30px rgba(0,0,0,0.15);
@@ -899,15 +887,18 @@
   background-color: #e9ecef;
   font-weight: 600;
 }
-
-/* Search input */
+.form-control, .form-select, .vs__search, .vs__selected, .vs__dropdown-toggle {
+  border:none;
+  padding: none;
+  
+}
 .search-input {
   border-radius: 0.5rem;
   padding: 0.6rem 1rem;
 }
 </style>
 
-
+      
 <script>
 import { defineComponent, ref, reactive, watch, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
@@ -933,42 +924,48 @@ export default defineComponent({
 
     // Reactive formData
     const formData = reactive({ ...props.datas });
-    watch(
-      () => props.datas,
-      (newVal) => {
-        Object.assign(formData, newVal);
-      },
-      { deep: true, immediate: true }
-    );
 
-    // Watch formData.prixod_table for changes to trigger summa
-    watch(
-      () => formData.prixod_table,
-      () => {
-        summa();
-      },
-      { deep: true }
-    );
+  watch(
+  () => props.datas,
+  (newVal) => {
+    if (!newVal) return;
+
+    const isUpdate = !!newVal.id; // id bor bo‘lsa update rejim
+
+    for (const key in newVal) {
+      if (key === 'prixod_table') {
+        formData.prixod_table = JSON.parse(JSON.stringify(newVal.prixod_table));
+      } else if (['pay_type_id', 'kontragent_id', 'dollar_rate', 'sklad_id'].includes(key)) {
+        if (isUpdate) {
+          formData[key] = newVal[key]; // update bo‘lsa ustidan yoz
+        }
+      } else {
+        formData[key] = newVal[key]; // qolganini har doim yoz
+      }
+    }
+  },
+  { immediate: true }
+);
 
     const settings = ref([
       { column: '№', width: 70, view: true },
       { column: 'shtrix_kod', width: 120, view: true },
       { column: 'product_id', width: 300, view: true },
-      { column: 'current_balance', width: 100, view: true },
-      { column: 'count', width: 100, view: true },
-      { column: 'kontragent_price', width: 100, view: true },
+      { column: 'current_balance', width: 120, view: true },
+      { column: 'count', width: 120, view: true },
+      { column: 'kontragent_price', width: 120, view: true },
       { column: 'kontragent_summa', width: 120, view: true },
-      { column: 'debit_price', width: 100, view: true },
+      { column: 'debit_price', width: 120, view: true },
       { column: 'debit_summa', width: 120, view: true },
-      { column: 'chakana_percent', width: 100, view: true },
-      { column: 'chakana_price', width: 100, view: true },
-      { column: 'chakana_dollar_price', width: 100, view: true },
-      { column: 'optom_percent', width: 100, view: true },
-      { column: 'optom_price', width: 100, view: true },
-      { column: 'optom_dollar_price', width: 100, view: true },
+      { column: 'chakana_percent', width: 120, view: true },
+      { column: 'chakana_price', width: 120, view: true },
+      { column: 'chakana_dollar_price', width: 120, view: true },
+      { column: 'optom_percent', width: 120, view: true },
+      { column: 'optom_price', width: 120, view: true },
+      { column: 'optom_dollar_price', width: 120, view: true },
       { column: 'del', width: 70, view: true },
-      { column: 'pack_count', width: 100, view: true },
-      { column: 'pack_price', width: 100, view: true },
+      { column: 'pack_count', width: 120, view: true },
+      { column: 'pack_price', width: 120, view: true },
     ]);
     const kontragent = ref({ name: '' });
     const shtrixList = ref([]);
@@ -1022,6 +1019,13 @@ export default defineComponent({
       emitter.all.clear();
       window.removeEventListener('storage', handleStorage);
     });
+
+    // Handle storage event
+    function handleStorage(event) {
+      if (event.key === 'sklad_id') {
+        formData.sklad_id = parseInt(event.newValue) || 0;
+      }
+    }
 
     // Fetch data methods
     async function fetchProductList() {
@@ -1172,26 +1176,31 @@ export default defineComponent({
     const productChange = async (index) => {
       if (!changedisabled.value) {
         const item = formData.prixod_table[index];
-        if (!item.product_id) {
-          console.warn(`productChange [${index}]: No product_id provided`);
-          window.alert('Товар танланмади');
+        if (!item.product_id || !formData.sklad_id) {
+          console.warn(`productChange [${index}]: Missing product_id=${item.product_id} or sklad_id=${formData.sklad_id}`);
+          window.alert('Товар ёки склад танланмади');
           return;
         }
         const originalShtrix = item.shtrix_kod;
         const originalCount = parseFloat(item.count) || 0;
+        const originalBalance = parseFloat(item.current_balance) || 0;
         console.log(`Before productChange [${index}]: product_id=${item.product_id}, current_balance=${item.current_balance}, shtrix_kod=${item.shtrix_kod}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
         try {
-          // Fetch price and balance
           const response = await axios.post('api/v1/product/price-balance', {
             product_id: item.product_id,
             sklad_id: formData.sklad_id,
           });
           console.log(`API response price-balance:`, response.data);
 
-          // Update current_balance
-          item.current_balance = parseFloat(response.data.balance) || 0;
+          const newBalance = parseFloat(response.data.balance);
+          if (!isNaN(newBalance) && newBalance >= 0) {
+            item.current_balance = roundNumber(newBalance, 0);
+          } else {
+            item.current_balance = originalBalance;
+            console.warn(`Invalid balance received for product_id=${item.product_id}, retaining original balance: ${originalBalance}`);
+            window.alert('API дан нотўғри қолдиқ маълумоти олинди');
+          }
 
-          // Initialize fields
           item.optom_price = roundNumber(item.optom_price);
           item.chakana_price = roundNumber(item.chakana_price);
           item.kontragent_price = roundNumber(item.kontragent_price);
@@ -1201,7 +1210,6 @@ export default defineComponent({
           item.pack_count = roundNumber(item.pack_count);
           item.kontragent_summa = roundNumber(item.kontragent_summa);
 
-          // Update prices based on pay_type_id
           if (formData.pay_type_id === 3) {
             if (response.data.price_type === 2) {
               item.kontragent_price = roundNumber(response.data.delivery_price) || item.kontragent_price;
@@ -1250,7 +1258,6 @@ export default defineComponent({
             }
           }
 
-          // Fetch product details
           const productResponse = await axios.get(`api/v1/product/id/${item.product_id}`);
           console.log(`API response product details:`, productResponse.data);
           item.pack_norma = parseFloat(productResponse.data.pack_count) || item.pack_norma || 0;
@@ -1260,7 +1267,6 @@ export default defineComponent({
             window.alert('Штрих код топилмади');
           }
 
-          // Recalculate sums
           item.kontragent_summa = roundNumber(item.kontragent_price * item.count);
           item.debit_summa = roundNumber(item.debit_price * item.count);
           item.chakana_summa = roundNumber(item.chakana_price * item.count);
@@ -1270,6 +1276,7 @@ export default defineComponent({
           summa();
         } catch (error) {
           console.error('Product change error:', error);
+          item.current_balance = originalBalance;
           window.alert('Товар маълумотларини олишда хатолик');
         }
       }
@@ -1351,6 +1358,88 @@ export default defineComponent({
       formData.count_all = roundNumber(formData.count_all);
       formData.prixod_summa = roundNumber(formData.prixod_summa);
       console.log(`Total: summa=${formData.summa}, count_all=${formData.count_all}, prixod_summa=${formData.prixod_summa}`);
+    };
+
+    const rasxodXisobPercent = () => {
+      if (!changedisabled.value) {
+        if (formData.rasxod_summa !== 0 && formData.summa) {
+          const ortacharasxod = formData.rasxod_summa / formData.summa;
+          formData.prixod_table.forEach((item, index) => {
+            item.debit_price = roundNumber(
+              parseFloat(item.kontragent_price) + item.kontragent_price * ortacharasxod
+            );
+            item.debit_summa = roundNumber(item.debit_price * item.count);
+            if (item.chakana_dollar_price > 0) {
+              changePercentChakana(index);
+            }
+            if (item.optom_dollar_price > 0) {
+              changePercentOptom(index);
+            }
+          });
+        } else {
+          formData.prixod_table.forEach((item, index) => {
+            item.debit_price = roundNumber(item.kontragent_price);
+            item.debit_summa = roundNumber(item.debit_price * item.count);
+            if (item.chakana_dollar_price > 0) {
+              changePercentChakana(index);
+            }
+            if (item.optom_dollar_price > 0) {
+              changePercentOptom(index);
+            }
+          });
+        }
+        summa();
+      }
+    };
+
+    const rasxodXisob = () => {
+      if (!changedisabled.value) {
+        if (formData.rasxod_summa !== 0 && formData.summa) {
+          const ortacharasxod = formData.rasxod_summa / formData.summa;
+          formData.prixod_table.forEach((item, index) => {
+            item.debit_price = roundNumber(
+              parseFloat(item.kontragent_price) + item.kontragent_price * ortacharasxod
+            );
+            item.debit_summa = roundNumber(item.debit_price * item.count);
+            if (formData.pay_type_id === 3) {
+              if (item.chakana_dollar_price > 0) {
+                changePriceChakanaDollar(index);
+              }
+              if (item.optom_dollar_price > 0) {
+                changePriceOptomDollar(index);
+              }
+            } else {
+              if (item.chakana_price > 0) {
+                changePriceChakana(index);
+              }
+              if (item.optom_price > 0) {
+                changePriceOptom(index);
+              }
+            }
+          });
+        } else {
+          formData.prixod_table.forEach((item, index) => {
+            item.debit_price = roundNumber(item.kontragent_price);
+            item.debit_summa = roundNumber(item.debit_price * item.count);
+            if (formData.pay_type_id === 3) {
+              if (item.chakana_dollar_price > 0) {
+                changePriceChakanaDollar(index);
+              }
+              if (item.optom_dollar_price > 0) {
+                changePriceOptomDollar(index);
+              }
+            } else {
+              if (item.chakana_price > 0) {
+                changePriceChakana(index);
+              }
+              if (item.optom_price > 0) {
+                changePriceOptom(index);
+              }
+            }
+          });
+        }
+        summa();
+      }
     };
 
     const saveDocument = async (type = 'default') => {
@@ -1444,6 +1533,22 @@ export default defineComponent({
       }
     };
 
+    const openModal = (modalId) => {
+      modals[modalId]?.show();
+    };
+
+    const saveKontragent = async () => {
+      try {
+        const response = await axios.post('/api/v1/kontragent', kontragent.value);
+        kontragentList.value.push(response.data);
+        formData.kontragent_id = response.data.id;
+        modals['modal-kontragent'].hide();
+      } catch (error) {
+        console.error('Save kontragent error:', error);
+        window.alert('Ётказувчи сақлашда хатолик');
+      }
+    };
+
     const changePrice = (index) => {
       if (!changedisabled.value) {
         const item = formData.prixod_table[index];
@@ -1515,23 +1620,25 @@ export default defineComponent({
     };
 
     const changePercentOptom = (index) => {
-      const item = formData.prixod_table[index];
-      const originalCount = parseFloat(item.count) || 0;
-      console.log(`changePercentOptom [${index}]: optom_percent=${item.optom_percent}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
-      item.optom_percent = roundNumber(item.optom_percent);
-      if (formData.pay_type_id === 3) {
-        item.optom_dollar_price = roundNumber((parseFloat(item.debit_price) || 0) * (item.optom_percent / 100 + 1));
-        item.optom_price = roundNumber(item.optom_dollar_price * (formData.dollar_rate || 1));
-        item.optom_summa = roundNumber(item.optom_price * originalCount);
-      } else {
-        item.optom_price = roundNumber((parseFloat(item.debit_price) || 0) * (item.optom_percent / 100 + 1));
-        item.optom_summa = roundNumber(item.optom_price * originalCount);
-        item.optom_dollar_price = formData.dollar_rate ? roundNumber(item.optom_price / formData.dollar_rate) : 0;
+      if (!changedisabled.value) {
+        const item = formData.prixod_table[index];
+        const originalCount = parseFloat(item.count) || 0;
+        console.log(`changePercentOptom [${index}]: optom_percent=${item.optom_percent}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
+        item.optom_percent = roundNumber(item.optom_percent);
+        if (formData.pay_type_id === 3) {
+          item.optom_dollar_price = roundNumber((parseFloat(item.debit_price) || 0) * (item.optom_percent / 100 + 1));
+          item.optom_price = roundNumber(item.optom_dollar_price * (formData.dollar_rate || 1));
+          item.optom_summa = roundNumber(item.optom_price * originalCount);
+        } else {
+          item.optom_price = roundNumber((parseFloat(item.debit_price) || 0) * (item.optom_percent / 100 + 1));
+          item.optom_summa = roundNumber(item.optom_price * originalCount);
+          item.optom_dollar_price = formData.dollar_rate ? roundNumber(item.optom_price / formData.dollar_rate) : 0;
+        }
+        item.count = originalCount;
+        item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
+        console.log(`After changePercentOptom [${index}]: optom_price=${item.optom_price}, optom_summa=${item.optom_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
+        summa();
       }
-      item.count = originalCount;
-      item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
-      console.log(`After changePercentOptom [${index}]: optom_price=${item.optom_price}, optom_summa=${item.optom_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
-      summa();
     };
 
     const changePercentChakana = (index) => {
@@ -1556,70 +1663,18 @@ export default defineComponent({
       }
     };
 
-    const changePriceOptom = (index) => {
-      const item = formData.prixod_table[index];
-      const originalCount = parseFloat(item.count) || 0;
-      console.log(`changePriceOptom [${index}]: optom_price=${item.optom_price}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
-      item.optom_price = roundNumber(item.optom_price);
-      if (item.debit_price > 0) {
-        if (formData.pay_type_id === 3) {
-          item.optom_dollar_price = formData.dollar_rate ? roundNumber(item.optom_price / formData.dollar_rate) : 0;
-          item.optom_percent = roundNumber((item.optom_dollar_price / item.debit_price) * 100 - 100);
-          item.optom_summa = roundNumber(item.optom_price * originalCount);
-        } else {
-          item.optom_percent = roundNumber((item.optom_price / item.debit_price) * 100 - 100);
-          item.optom_summa = roundNumber(item.optom_price * originalCount);
-          item.optom_dollar_price = formData.dollar_rate ? roundNumber(item.optom_price / formData.dollar_rate) : 0;
-        }
-      }
-      item.count = originalCount;
-      item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
-      console.log(`After changePriceOptom [${index}]: optom_percent=${item.optom_percent}, optom_summa=${item.optom_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
-      summa();
-    };
-
-    const changePriceOptomDollar = (index) => {
-      const item = formData.prixod_table[index];
-      const originalCount = parseFloat(item.count) || 0;
-      console.log(`changePriceOptomDollar [${index}]: optom_dollar_price=${item.optom_dollar_price}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
-      item.optom_dollar_price = roundNumber(item.optom_dollar_price);
-      if (item.debit_price > 0) {
-        if (formData.pay_type_id === 3) {
-          item.optom_price = roundNumber(item.optom_dollar_price * (formData.dollar_rate || 1));
-          item.optom_percent = roundNumber((item.optom_dollar_price / item.debit_price) * 100 - 100);
-          item.optom_summa = roundNumber(item.optom_price * originalCount);
-        } else {
-          item.optom_price = roundNumber(item.optom_dollar_price * (formData.dollar_rate || 1));
-          item.optom_percent = roundNumber((item.optom_price / item.debit_price) * 100 - 100);
-          item.optom_summa = roundNumber(item.optom_price * originalCount);
-        }
-      }
-      item.count = originalCount;
-      item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
-      console.log(`After changePriceOptomDollar [${index}]: optom_price=${item.optom_price}, optom_summa=${item.optom_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
-      summa();
-    };
-
     const changePriceChakana = (index) => {
       if (!changedisabled.value) {
         const item = formData.prixod_table[index];
         const originalCount = parseFloat(item.count) || 0;
         console.log(`changePriceChakana [${index}]: chakana_price=${item.chakana_price}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
         item.chakana_price = roundNumber(item.chakana_price);
-        if (item.debit_price > 0) {
-          if (formData.pay_type_id === 3) {
-            item.chakana_dollar_price = formData.dollar_rate ? roundNumber(item.chakana_price / formData.dollar_rate) : 0;
-            item.chakana_percent = roundNumber((item.chakana_dollar_price / item.debit_price) * 100 - 100);
-            item.chakana_summa = roundNumber(item.chakana_price * originalCount);
-          } else {
-            item.chakana_percent = roundNumber((item.chakana_price / item.debit_price) * 100 - 100);
-            item.chakana_summa = roundNumber(item.chakana_price * originalCount);
-            item.chakana_dollar_price = formData.dollar_rate ? roundNumber(item.chakana_price / formData.dollar_rate) : 0;
-          }
-        }
+        item.chakana_percent = item.debit_price ? roundNumber((item.chakana_price / item.debit_price) * 100 - 100) : 0;
+        item.chakana_dollar_price = formData.dollar_rate ? roundNumber(item.chakana_price / formData.dollar_rate) : 0;
+        item.chakana_summa = roundNumber(item.chakana_price * originalCount);
         item.count = originalCount;
         item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
-        console.log(`After changePriceChakana [${index}]: chakana_percent=${item.chakana_percent}, chakana_summa=${item.chakana_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
+        console.log(`After changePriceChakana [${index}]: chakana_price=${item.chakana_price}, chakana_summa=${item.chakana_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
         summa();
       }
     };
@@ -1630,17 +1685,9 @@ export default defineComponent({
         const originalCount = parseFloat(item.count) || 0;
         console.log(`changePriceChakanaDollar [${index}]: chakana_dollar_price=${item.chakana_dollar_price}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
         item.chakana_dollar_price = roundNumber(item.chakana_dollar_price);
-        if (item.debit_price > 0) {
-          if (formData.pay_type_id === 3) {
-            item.chakana_price = roundNumber(item.chakana_dollar_price * (formData.dollar_rate || 1));
-            item.chakana_percent = roundNumber((item.chakana_dollar_price / item.debit_price) * 100 - 100);
-            item.chakana_summa = roundNumber(item.chakana_price * originalCount);
-          } else {
-            item.chakana_price = roundNumber(item.chakana_dollar_price * (formData.dollar_rate || 1));
-            item.chakana_percent = roundNumber((item.chakana_price / item.debit_price) * 100 - 100);
-            item.chakana_summa = roundNumber(item.chakana_price * originalCount);
-          }
-        }
+        item.chakana_price = roundNumber(item.chakana_dollar_price * (formData.dollar_rate || 1));
+        item.chakana_percent = item.debit_price ? roundNumber((item.chakana_price / item.debit_price) * 100 - 100) : 0;
+        item.chakana_summa = roundNumber(item.chakana_price * originalCount);
         item.count = originalCount;
         item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
         console.log(`After changePriceChakanaDollar [${index}]: chakana_price=${item.chakana_price}, chakana_summa=${item.chakana_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
@@ -1648,131 +1695,61 @@ export default defineComponent({
       }
     };
 
-    const rasxodXisob = () => {
+    const changePriceOptom = (index) => {
       if (!changedisabled.value) {
-        if (formData.rasxod_summa && formData.summa) {
-          const ortacharasxod = formData.rasxod_summa / formData.summa;
-          formData.prixod_table.forEach((item, index) => {
-            item.debit_price = roundNumber(parseFloat(item.kontragent_price) + item.kontragent_price * ortacharasxod);
-            item.debit_summa = roundNumber(item.debit_price * item.count);
-            if (formData.pay_type_id === 3) {
-              if (item.chakana_dollar_price > 0) changePriceChakanaDollar(index);
-              if (item.optom_dollar_price > 0) changePriceOptomDollar(index);
-            } else {
-              if (item.optom_price > 0) changePriceOptom(index);
-              if (item.chakana_price > 0) changePriceChakana(index);
-            }
-          });
-        } else {
-          formData.prixod_table.forEach((item, index) => {
-            item.debit_price = roundNumber(item.kontragent_price);
-            item.debit_summa = roundNumber(item.debit_price * item.count);
-            if (formData.pay_type_id === 3) {
-              if (item.chakana_dollar_price > 0) changePriceChakanaDollar(index);
-              if (item.optom_dollar_price > 0) changePriceOptomDollar(index);
-            } else {
-              if (item.optom_price > 0) changePriceOptom(index);
-              if (item.chakana_price > 0) changePriceChakana(index);
-            }
-          });
-        }
+        const item = formData.prixod_table[index];
+        const originalCount = parseFloat(item.count) || 0;
+        console.log(`changePriceOptom [${index}]: optom_price=${item.optom_price}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
+        item.optom_price = roundNumber(item.optom_price);
+        item.optom_percent = item.debit_price ? roundNumber((item.optom_price / item.debit_price) * 100 - 100) : 0;
+        item.optom_dollar_price = formData.dollar_rate ? roundNumber(item.optom_price / formData.dollar_rate) : 0;
+        item.optom_summa = roundNumber(item.optom_price * originalCount);
+        item.count = originalCount;
+        item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
+        console.log(`After changePriceOptom [${index}]: optom_price=${item.optom_price}, optom_summa=${item.optom_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
         summa();
       }
     };
 
-    const rasxodXisobPercent = () => {
+    const changePriceOptomDollar = (index) => {
       if (!changedisabled.value) {
-        if (formData.rasxod_summa && formData.summa) {
-          const ortacharasxod = formData.rasxod_summa / formData.summa;
-          formData.prixod_table.forEach((item, index) => {
-            item.debit_price = roundNumber(parseFloat(item.kontragent_price) + item.kontragent_price * ortacharasxod);
-            item.debit_summa = roundNumber(item.debit_price * item.count);
-            if (item.chakana_dollar_price > 0) changePercentChakana(index);
-            if (item.optom_dollar_price > 0) changePercentOptom(index);
-          });
-        } else {
-          formData.prixod_table.forEach((item, index) => {
-            item.debit_price = roundNumber(item.kontragent_price);
-            item.debit_summa = roundNumber(item.debit_price * item.count);
-            if (item.chakana_dollar_price > 0) changePercentChakana(index);
-            if (item.optom_dollar_price > 0) changePercentOptom(index);
-          });
-        }
+        const item = formData.prixod_table[index];
+        const originalCount = parseFloat(item.count) || 0;
+        console.log(`changePriceOptomDollar [${index}]: optom_dollar_price=${item.optom_dollar_price}, debit_price=${item.debit_price}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
+        item.optom_dollar_price = roundNumber(item.optom_dollar_price);
+        item.optom_price = roundNumber(item.optom_dollar_price * (formData.dollar_rate || 1));
+        item.optom_percent = item.debit_price ? roundNumber((item.optom_price / item.debit_price) * 100 - 100) : 0;
+        item.optom_summa = roundNumber(item.optom_price * originalCount);
+        item.count = originalCount;
+        item.kontragent_summa = roundNumber((parseFloat(item.kontragent_price) || 0) * item.count);
+        console.log(`After changePriceOptomDollar [${index}]: optom_price=${item.optom_price}, optom_summa=${item.optom_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
         summa();
       }
     };
 
     const trashItem = (index) => {
-      const answer = window.confirm('Маълумотлар ўчирилсинми?');
-      if (answer) {
-        formData.summa -= roundNumber(formData.prixod_table[index].kontragent_summa);
-        formData.prixod_summa -= roundNumber(formData.prixod_table[index].debit_summa);
-        formData.count_all -= roundNumber(formData.prixod_table[index].count);
+      if (!changedisabled.value) {
         formData.prixod_table.splice(index, 1);
         summa();
       }
     };
 
-    const openModal = (modalId) => {
-      if (modals[modalId]) {
-        modals[modalId].show();
-      } else {
-        console.error(`Modal ${modalId} not initialized`);
-      }
-    };
-
-    const saveKontragent = async () => {
-      try {
-        await axios.post('/api/v1/kontragent', kontragent.value);
-        await fetchKontragentList();
-        formData.kontragent_id = kontragentList.value.find(k => k.name === kontragent.value.name)?.id || formData.kontragent_id;
-        modals['modal-kontragent'].hide();
-      } catch (error) {
-        console.error('Save kontragent error:', error);
-        window.alert('Ётказувчини сақлашда хатолик');
-      }
-    };
-
     const tableFocus = () => {
-      const inputs = document.querySelectorAll('.table-responsive input, .table-responsive select');
-      if (inputs.length > 0) {
-        inputs[inputs.length - 1].focus();
+      const lastRow = formData.prixod_table.length - 1;
+      if (lastRow >= 0) {
+        const input = document.querySelector(`tbody tr:nth-child(${lastRow + 1}) input[placeholder="Kod"]`);
+        if (input) {
+          input.focus();
+        }
       }
-    };
-
-    const setRule = (path) => {
-      console.log('Қўллаш қоида:', path);
-    };
-
-    const next = () => {
-      console.log('Кейинги');
-    };
-
-    const label = (value) => {
-      return value;
     };
 
     const focusNextInput = () => {
-      const activeElement = document.activeElement;
-      const inputs = Array.from(document.querySelectorAll('input, select, textarea, button')).filter(el => el.offsetParent !== null);
-      const index = inputs.indexOf(activeElement);
-      if (index >= 0 && index + 2 < inputs.length) {
-        inputs[index + 2].focus();
-      }
-    };
-
-    const handleStorage = () => {
-      if (localStorage.getItem('setted_product') > 0) {
-        fetchProductList();
-        const index = store.state.selected_index;
-        if (index != null) {
-          const originalShtrix = formData.prixod_table[index].shtrix_kod;
-          formData.prixod_table[index].product_id = parseInt(localStorage.getItem('setted_product'));
-          productChange(index);
-          formData.prixod_table[index].shtrix_kod = originalShtrix;
-        }
-        localStorage.setItem('setted_product', 0);
-        setTimeout(() => next(), 1000);
+      const inputs = document.querySelectorAll('tbody input');
+      const currentInput = document.activeElement;
+      const currentIndex = Array.from(inputs).indexOf(currentInput);
+      if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+        inputs[currentIndex + 1].focus();
       }
     };
 
@@ -1792,10 +1769,13 @@ export default defineComponent({
       skladhave,
       focusset,
       settedRule,
+      productList,
       width1,
       width2,
       filteredRows,
       paginated,
+      formatNumber,
+      roundNumber,
       loadSettings,
       saveSettings,
       createProduct,
@@ -1805,32 +1785,27 @@ export default defineComponent({
       shtrix,
       addTable,
       summa,
+      rasxodXisob,
+      rasxodXisobPercent,
       saveDocument,
       closePage,
       change,
       setDatetime,
+      openModal,
+      saveKontragent,
       changePrice,
       changePackPrice,
       changeCount,
       changePack,
       changePercentOptom,
       changePercentChakana,
-      changePriceOptom,
-      changePriceOptomDollar,
       changePriceChakana,
       changePriceChakanaDollar,
-      rasxodXisob,
-      rasxodXisobPercent,
+      changePriceOptom,
+      changePriceOptomDollar,
       trashItem,
-      openModal,
-      saveKontragent,
       tableFocus,
-      setRule,
-      next,
-      label,
       focusNextInput,
-      handleStorage,
-      formatNumber,
     };
   },
 });
