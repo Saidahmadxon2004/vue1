@@ -13,14 +13,14 @@
           placeholder="Sklad tanlang"
         />
 
-        <!-- Admin select -->
+        <!-- Admin select (doim ko‘rinadi) -->
         <Vue3Select
-          v-if="selectedSklad"
           v-model="selectedAdmin"
           :options="filteredAdmins"
           label="username"
           :reduce="admin => admin.username"
           placeholder="Admin tanlang"
+          :disabled="!selectedSklad"
           class="mt-3"
         />
 
@@ -64,9 +64,7 @@ export default {
       parol: '',
       showErr: false,
       options: [],
-      admins: [{username:"Админ",
-        skladId:1
-      }]
+      admins: []
     }
   },
   computed: {
@@ -94,13 +92,13 @@ export default {
     async loadAdmins() {
       try {
         const res = await axios.get('/api/v1/users')
-        console.log(res.data)
         this.admins = res.data.map(user => ({
           username: user.username,
           skladId: user.sklad_id
         }))
       } catch (error) {
         console.error('Adminlarni olishda xatolik:', error)
+       
       }
     },
     async handleLogin() {

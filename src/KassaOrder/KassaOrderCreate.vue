@@ -10,7 +10,7 @@
       return {
         'datas': {
            datetime: Math.floor(Date.now() / 1000),
-        sklad_id: null,
+        sklad_id: 1,
         summa: 0,
         dollar_rate: 11000,
         dollar_summa: 0,

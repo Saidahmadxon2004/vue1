@@ -108,7 +108,7 @@ export default {
         firma.name.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     }
-  },
+  }, 
   mounted() {
     this.modal = new Modal(document.getElementById('firmaModal'));
     this.editModal = new Modal(document.getElementById('firmaEditModal'));

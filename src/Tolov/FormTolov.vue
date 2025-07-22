@@ -21,15 +21,15 @@
           <label for="warehouse" class="form-label">Склад <span class="text-danger">*</span></label>
           <v-select
             id="warehouse"
-            v-model="formData.sklad_id"
+            v-model="datasend.sklad_id"
             :options="warehouseOptions"
             :reduce="option => option.id"
             label="name"
             placeholder="Складни танланг..."
             required
-            :class="{'is-invalid': !formData.sklad_id && formSubmitted}"
+            :class="{'is-invalid': !datasend.sklad_id && formSubmitted}"
           ></v-select>
-          <div class="invalid-feedback" v-if="!formData.sklad_id && formSubmitted">
+          <div class="invalid-feedback" v-if="!datasend.sklad_id && formSubmitted">
             Склад танланиши шарт.
           </div>
         </div>
@@ -41,13 +41,13 @@
             <div class="input-group">
               <v-select
                 id="counterparty"
-                v-model="formData.counterparty_id"
+                v-model="datasend.kontragent_id"
                 :options="kontragentOptions"
                 :reduce="option => option.id"
                 label="name"
                 placeholder="Контрагентни танланг..."
                 required
-                :class="{'is-invalid': !formData.counterparty_id && formSubmitted, 'custom-vs-select': true}"
+                :class="{'is-invalid': !datasend.kontragent_id && formSubmitted, 'custom-vs-select': true}"
                 @update:modelValue="handleKontragentSelectChange"
                 :filterable="true"
               >
@@ -61,7 +61,7 @@
               <button class="btn btn-outline-secondary btn-more" type="button" @click="showKontragentSelectModal = true">
                 ...
               </button>
-              <div class="invalid-feedback" v-if="!formData.counterparty_id && formSubmitted">
+              <div class="invalid-feedback" v-if="!datasend.kontragent_id && formSubmitted">
                 Контрагент танланиши шарт.
               </div>
             </div>
@@ -80,16 +80,16 @@
             <label for="paymentType" class="form-label">Тўлов тури <span class="text-danger">*</span></label>
             <v-select
               id="paymentType"
-              v-model="formData.payment_type_id"
+              v-model="datasend.pay_type_id"
               :options="paymentTypeOptions"
               :reduce="option => option.id"
               label="name"
               placeholder="Тўлов турини танланг..."
               required
-              :class="{'is-invalid': !formData.payment_type_id && formSubmitted}"
+              :class="{'is-invalid': !datasend.pay_type_id && formSubmitted}"
               @option:selected="handlePaymentTypeChange"
             ></v-select>
-            <div class="invalid-feedback" v-if="!formData.payment_type_id && formSubmitted">
+            <div class="invalid-feedback" v-if="!datasend.pay_type_id && formSubmitted">
               Тўлов тури танланиши шарт.
             </div>
           </div>
@@ -98,7 +98,8 @@
             <input
               type="number"
               id="amount"
-              :value="calculatedTotalAmount"
+              v-model="datasend.summa"
+           
               class="form-control"
               disabled
             />
@@ -108,12 +109,12 @@
             <input
               type="date"
               id="paymentTime"
-              v-model="formData.payment_date"
+              v-model="datasend.datetime"
               class="form-control"
               required
-              :class="{'is-invalid': !formData.payment_date && formSubmitted}"
+              :class="{'is-invalid': !datasend.datetime && formSubmitted }"
             />
-            <div class="invalid-feedback" v-if="!formData.payment_date && formSubmitted">
+            <div class="invalid-feedback" v-if="!datasend.datetime">
               Тўлов вақти киритилиши шарт.
             </div>
           </div>
@@ -121,16 +122,16 @@
 
         <div class="mb-3">
           <label for="comment" class="form-label">Комментарий</label>
-          <textarea id="comment" v-model="formData.comment" class="form-control" rows="3"></textarea>
+          <textarea id="comment" v-model="datasend.comment" class="form-control" rows="3"></textarea>
         </div>
       </div>
 
       <div class="col-md-6">
         <div class="mb-3">
           <label for="type" class="form-label">Тури <span class="text-danger">*</span></label>
-          <select id="type" v-model="formData.transaction_type" class="form-select" required>
-            <option value="income">Кирим</option>
-            <option value="expense">Чиқим</option>
+          <select id="type" v-model="datasend.type" class="form-select" required>
+            <option value=true>Кирим</option>
+            <option value=false>Чиқим</option>
           </select>
         </div>
 
@@ -141,7 +142,7 @@
             <input
               type="number"
               id="cashDollar"
-              v-model.number="formData.cash_dollar"
+              v-model.number="datasend.dollar_summa"
               class="form-control"
               step="0.01"
               @input="updateTotalAmount"
@@ -152,7 +153,7 @@
             <input
               type="number"
               id="cashSum"
-              v-model.number="formData.cash_sum"
+              v-model.number="datasend.kassa_summa"
               class="form-control"
               @input="updateTotalAmount"
             />
@@ -162,7 +163,7 @@
             <input
               type="number"
               id="plastic"
-              v-model.number="formData.plastic"
+              v-model.number="datasend.plastic_summa"
               class="form-control"
               @input="updateTotalAmount"
             />
@@ -172,7 +173,7 @@
             <input
               type="number"
               id="transfer"
-              v-model.number="formData.transfer"
+              v-model.number="datasend.shot_summa"
               class="form-control"
               @input="updateTotalAmount"
             />
@@ -183,7 +184,7 @@
               <input
                 type="number"
                 id="changeSum"
-                v-model.number="formData.change_sum"
+                v-model.number="datasend.qaytim_som"
                 class="form-control"
                 @input="updateTotalAmount"
               />
@@ -194,7 +195,7 @@
               <input
                 type="number"
                 id="changeDollar"
-                v-model.number="formData.change_dollar"
+                v-model.number="datasend.qaytim_dollar"
                 class="form-control"
                 step="0.01"
                 @input="updateTotalAmount"
@@ -208,7 +209,7 @@
           <input
             type="number"
             id="exchangeRate"
-            v-model.number="formData.dollar_rate"
+            v-model.number="datasend.dollar_rate"
             class="form-control"
             @input="updateTotalAmount"
           />
@@ -232,36 +233,12 @@ import TolovModal from './TolovModal.vue';
 
 export default {
   components: {
-   Vue3Select,
+    Vue3Select,
     TolovModal,
   },
-  props: {
-    datasend: {
-      type: Object,
-      default: () => ({
-        sklad_id: null,
-        counterparty_id: null,
-        counterparty_name: '',
-        balance_usd: 0,
-        balance_uzs: 0,
-        payment_type_id: null,
-        amount: 0,
-        payment_date: moment().format('YYYY-MM-DD'),
-        comment: '',
-        transaction_type: 'income',
-        cash_dollar: 0,
-        cash_sum: 0,
-        plastic: 0,
-        transfer: 0,
-        change_sum: 0,
-        change_dollar: 0,
-        dollar_rate: 13000,
-      }),
-    },
-  },
+  props: ["datasend"],
   data() {
     return {
-      formData: { ...this.datasend },
       warehouses: [],
       paymentTypes: [],
       kontragents: [],
@@ -280,269 +257,174 @@ export default {
     kontragentOptions() {
       return this.kontragents.map(k => ({ id: k.id, name: k.name }));
     },
+
     formattedBalance() {
-      const usdBalance = parseFloat(this.formData.balance_usd) || 0;
-      const uzsBalance = parseFloat(this.formData.balance_uzs) || 0;
-      return `${usdBalance.toFixed(2)} $ || ${uzsBalance.toLocaleString('en-US')}`;
+     this.fetchKontragentBalance(this.datasend.kontragent_id)
+      const usd = parseFloat(this.datasend.current_total_dollar) || 0;
+      const uzs = parseFloat(this.datasend.current_total) || 0;
+      return `${usd.toFixed(2)} $ || ${uzs.toLocaleString('en-US')}`;
+      
+     
     },
-    calculatedTotalAmount() {
-      let total = 0;
-      const rate = this.formData.dollar_rate || 1;
-
-      const cashDollar = this.formData.cash_dollar || 0;
-      const cashSum = this.formData.cash_sum || 0;
-      const plastic = this.formData.plastic || 0;
-      const transfer = this.formData.transfer || 0;
-      const changeDollar = this.formData.change_dollar || 0;
-      const changeSum = this.formData.change_sum || 0;
-
-      let cashDollarConverted = cashDollar;
-      let cashSumConverted = cashSum;
-      let plasticConverted = plastic;
-      let transferConverted = transfer;
-      let changeDollarConverted = changeDollar;
-      let changeSumConverted = changeSum;
-
-      if (this.formData.payment_type_id === this.dollarPaymentTypeId) {
-        if (rate !== 0) {
-          cashSumConverted = cashSum / rate;
-          plasticConverted = plastic / rate;
-          transferConverted = transfer / rate;
-          changeSumConverted = changeSum / rate;
-        } else {
-          cashSumConverted = plasticConverted = transferConverted = changeSumConverted = 0;
-        }
-        total = (cashDollarConverted + cashSumConverted + plasticConverted + transferConverted) -
-                (changeDollarConverted + changeSumConverted);
-        return parseFloat(total.toFixed(2));
-      } else {
-        cashDollarConverted = cashDollar * rate;
-        changeDollarConverted = changeDollar * rate;
-        total = (cashDollarConverted + cashSumConverted + plasticConverted + transferConverted) -
-                (changeDollarConverted + changeSumConverted);
-        return parseFloat(total.toFixed(0));
-      }
-    }
-  },
-  watch: {
-    datasend: {
-      handler(newVal) {
-        if (newVal) {
-          this.formData = { ...newVal };
-          if (this.formData.payment_date) {
-            this.formData.payment_date = moment.unix(this.formData.payment_date).format('YYYY-MM-DD');
-          }
-          if (this.formData.counterparty_id) {
-            this.fetchKontragentBalance(this.formData.counterparty_id);
-            this.fetchKontragentNameById(this.formData.counterparty_id);
-          }
-        }
-      },
-      deep: true,
-      immediate: true,
-    },
-    'formData.dollar_rate': {
-      handler() {
-        this.updateTotalAmount();
-      }
-    },
-    calculatedTotalAmount: {
-      handler(newVal) {
-        this.formData.amount = newVal;
-      },
-      immediate: true,
-    }
-  },
-  created() {
-    if (!this.$route.params.id) {
-      this.formData.payment_date = moment().format('YYYY-MM-DD');
-    }
   },
   mounted() {
     this.fetchWarehouses();
     this.fetchPaymentTypes();
     this.fetchKontragents();
     this.fetchLatestDollarRate();
+    
+   
+    if (!this.datasend.datetime) {
+      this.datasend.datetime = moment().format('YYYY-MM-DD');
+    }
   },
   methods: {
-     async handleKontragentSelection(kontragentId) {
-    await this.fetchKontragentBalance(kontragentId);
-    await this.fetchKontragentNameById(kontragentId);
-    this.formData.counterparty_id = kontragentId;
-  },
+    async handleKontragentSelection(id) {
+      await this.fetchKontragentBalance(id);
+      await this.fetchKontragentNameById(id);
+      this.datasend.kontragent_id = id;
+      console.log("ishladiyov" +id)
+    },
     async fetchWarehouses() {
       try {
-        const response = await this.$axios.get('/api/v1/sklads/skladnames');
-        this.warehouses = response.data;
-        if (this.warehouses.length > 0 && !this.formData.sklad_id) {
-          this.formData.sklad_id = this.warehouses[0].id;
+        const res = await this.$axios.get('/api/v1/sklads/skladnames');
+        this.warehouses = res.data;
+        if (!this.datasend.sklad_id && this.warehouses.length > 0) {
+          this.datasend.sklad_id = this.warehouses[0].id;
         }
-      } catch (error) {
-        console.error('Error fetching warehouses:', error);
-        alert('Складларни юклашда хатолик юз берди.');
+      } catch (err) {
+        alert('Склад юклашда хатолик');
       }
     },
+
     async fetchPaymentTypes() {
       try {
-        const response = await this.$axios.get('/api/v1/pay-type');
-        this.paymentTypes = response.data;
-        const dollarType = this.paymentTypes.find(type => type.name === 'Доллар');
-        if (dollarType) {
-          this.dollarPaymentTypeId = dollarType.id;
-        }
-      } catch (error) {
-        console.error('Error fetching payment types:', error);
-        alert('Тўлов турларини юклашда хатолик юз берди.');
+        const res = await this.$axios.get('/api/v1/pay-type');
+        this.paymentTypes = res.data;
+        const dollar = this.paymentTypes.find(p => p.name === 'Доллар');
+        if (dollar) this.dollarPaymentTypeId = dollar.id;
+      } catch (err) {
+        alert('Тўлов турлари юкланмади');
       }
     },
     async fetchKontragents() {
       try {
-        const response = await this.$axios.get('/api/v1/kontragent');
-        this.kontragents = response.data;
-      } catch (error) {
-        console.error('Error fetching kontragents:', error);
-        alert('Контрагентларни юклашда хатолик юз берди.');
+        const res = await this.$axios.get('/api/v1/kontragent');
+        this.kontragents = res.data;
+      } catch (err) {
+        alert('Контрагент юкланмади');
       }
-    },async fetchKontragentBalance(kontragentId) {
-  const self = this;
-  if (!kontragentId) {
-    this.formData.balance_usd = 0;
-    this.formData.balance_uzs = 0;
-    return;
-  }
-  try {
-    const response = await this.$axios({
-      method: "post",
-      url: "/api/v1/kontragent/total",
-      data: {
-        kontragent_id: kontragentId,
-        sklad_id: self.formData.sklad_id,
-        datetime: moment(self.formData.payment_date, "YYYY-MM-DD").unix()
+    },
+
+    async fetchKontragentBalance(id) {
+      try {
+        const res = await this.$axios.post('/api/v1/kontragent/total', {
+          kontragent_id: id,
+          sklad_id: this.datasend.sklad_id,
+          datetime: moment(this.datasend.datetime, 'YYYY-MM-DD').unix(),
+        });
+        this.datasend.current_total = 0;
+        this.datasend.current_total_dollar = 0;
+        res.data.forEach(el => {
+          if (el.pay_type_id === 3) {
+            this.datasend.current_total_dollar = parseFloat(el.total.toFixed(3));
+            console.log( this.datasend.current_total_dollar)
+          } else {
+            this.datasend.current_total += parseFloat(el.total.toFixed(3));
+          }
+        });
+      } catch (err) {
+        alert('Контрагент балансида хатолик');
       }
-    });
-
-    // Default balanslarni nolga qo'yib chiqamiz
-    this.formData.balance_usd = 0;
-    this.formData.balance_uzs = 0;
-
-    response.data.forEach(element => {
-      if (element.pay_type_id === 3) {
-        this.formData.balance_usd = parseFloat(element.total.toFixed(3));
-      } else {
-        this.formData.balance_uzs += parseFloat(element.total.toFixed(3));
-      }
-    });
-
-  } catch (error) {
-    console.error("Kontragent balansi olishda xatolik:", error);
-    alert("Kontagent balansini olishda xatolik yuz berdi.");
-    this.formData.balance_usd = 0;
-    this.formData.balance_uzs = 0;
-  }
-},
-
-    async fetchKontragentNameById(kontragentId) {
-      if (!kontragentId) {
-        this.formData.counterparty_name = '';
-        return;
-      }
-      const kontragent = this.kontragents.find(k => k.id === kontragentId);
-      if (kontragent) {
-        this.formData.counterparty_name = kontragent.name;
+    },
+    async fetchKontragentNameById(id) {
+      const found = this.kontragents.find(k => k.id === id);
+      if (found) {
+        this.datasend.kontragent_name = found.name;
       } else {
         try {
-          const response = await this.$axios.get(`/api/v1/kontragent/id/${kontragentId}`);
-          if (response.data && response.data.data) {
-            this.formData.counterparty_name = response.data.data.name;
-            if (!this.kontragents.some(k => k.id === kontragentId)) {
-              this.kontragents.push(response.data.data);
-            }
+          const res = await this.$axios.get(`/api/v1/kontragent/id/${id}`);
+          if (res.data?.data) {
+            this.datasend.kontragent_name = res.data.data.name;
+            this.kontragents.push(res.data.data);
           }
-        } catch (error) {
-          console.error('Error fetching kontragent name by ID:', error);
-          this.formData.counterparty_name = 'Номаълум Контрагент';
+        } catch (err) {
+          this.datasend.kontragent_name= 'Номаълум Контрагент';
         }
       }
     },
-    async handleKontragentSelectChange(selectedKontragentId) {
-      if (selectedKontragentId) {
-        await this.fetchKontragentBalance(selectedKontragentId);
-        await this.fetchKontragentNameById(selectedKontragentId);
-      } else {
-        this.formData.counterparty_name = '';
-        this.formData.balance_usd = 0;
-        this.formData.balance_uzs = 0;
-      }
-    },
+    
     async fetchLatestDollarRate() {
       try {
-        const response = await this.$axios.get('/api/v1/dollar-exchange-rate/last');
-        if (response.data && response.data.rate) {
-          this.formData.dollar_rate = response.data.rate;
+        const res = await this.$axios.get('/api/v1/dollar-exchange-rate/last');
+        if (res.data?.rate) {
+          this.datasend.dollar_rate = res.data.rate;
         }
-      } catch (error) {
-        console.error("Error fetching dollar exchange rate:", error);
-        alert('Доллар курсини юклашда хатолик юз берди. Дефолт курс ишлатилади.');
+      } catch (err) {
+        alert('Доллар курси юкланмади');
       }
     },
     updateTotalAmount() {
-      // Trigger recompute
-      this.formData.amount = this.calculatedTotalAmount;
+      const d = this.datasend;
+      if(d.pay_type_id===3){
+        d.summa=((parseFloat(d.kassa_summa) || 0) +
+        (parseFloat(d.plastic_summa) || 0) +
+        (parseFloat(d.shot_summa) || 0) -(parseFloat(d.qaytim_som) || 0))/(parseFloat(d.dollar_rate) || 1) +(parseFloat(d.dollar_summa) || 1)-(parseFloat(d.qaytim_dollar) || 0)
+      }
+      else{const total =
+        (parseFloat(d.kassa_summa) || 0) +
+        (parseFloat(d.plastic_summa) || 0) +
+        (parseFloat(d.shot_summa) || 0) +
+        ((parseFloat(d.dollar_summa) || 0) * (parseFloat(d.dollar_rate) || 1)) -
+        ((parseFloat(d.qaytim_som) || 0) + ((parseFloat(d.qaytim_dollar) || 0) * (parseFloat(d.dollar_rate) || 1)));
+      d.summa = parseFloat(total.toFixed(2));}
     },
     async send() {
       this.formSubmitted = true;
-      if (!this.formData.sklad_id || !this.formData.counterparty_id || !this.formData.payment_type_id || !this.formData.payment_date) {
-        alert('Илтимос, барча мажбурий майдонларни тўлдиринг: Склад, Контрагент, Тўлов тури, Тўлов вақти.');
+      const d = this.datasend;
+      if (!d.sklad_id || !d.kontragent_id || !d.pay_type_id || !d.datetime) {
+        alert('Барча мажбурий майдонларни тўлдиринг');
         return;
       }
 
-      let method = 'post';
-      let url = 'api/v1/kontragent-pay';
-
-      const sanitizedData = {
-        datetime: moment(this.formData.payment_date).unix(),
-        sklad_id: this.formData.sklad_id,
-        kontragent_id: this.formData.counterparty_id,
-        pay_type_id: this.formData.payment_type_id,
-        summa: this.calculatedTotalAmount,
-        current_total: parseFloat(this.formData.balance_uzs) || 0,
-        type: this.formData.transaction_type === 'income',
-
-        comment: this.formData.comment || '',
-        dollar_rate: this.formData.dollar_rate || 1,
-        pay_type_kassa: this.formData.payment_type_id || 1,
-        kassa_summa: this.formData.cash_sum || 0,
-        current_total_dollar: parseFloat(this.formData.balance_usd) || 0,
+      const data = {
+        sklad_id: d.sklad_id,
+        kontragent_id: d.kontragent_id,
+        pay_type_id: d.pay_type_id,
+        datetime: moment(d.datetime, 'YYYY-MM-DD').unix(),
+        summa: d.summa || 0,
+        dollar_rate: d.dollar_rate || 1,
+        kassa_summa: d.kassa_summa || 0,
+        plastic_summa: d.plastic_summa || 0,
+        shot_summa: d.shot_summa || 0,
+        qaytim_dollar: d.qaytim_dollar || 0,
+        qaytim_som: d.qaytim_som || 0,
+        current_total: parseFloat(d.current_total) || 0,
+        current_total_dollar: parseFloat(d.current_total_dollar) || 0,
+        comment: d.comment || '',
+        type: d.type,
         z_report: false,
-        dollar_summa: this.formData.cash_dollar || 0,
-        cash_summa: this.formData.cash_sum || 0,
-        plastic_summa: this.formData.plastic || 0,
-        shot_summa: this.formData.transfer || 0,
-        qaytim_dollar: this.formData.change_dollar || 0,
-        qaytim_som: this.formData.change_sum || 0
       };
 
+      let method = 'post';
+      let url = '/api/v1/kontragent-pay';
       if (this.$route.params.id) {
         method = 'patch';
-        url = 'api/v1/kontragent-pay/id/' + this.$route.params.id;
+        url = `/api/v1/kontragent-pay/id/${this.$route.params.id}`;
       }
 
       try {
-        await this.$axios({
-          method,
-          url,
-          data: sanitizedData,
-        });
+        await this.$axios({ method, url, data });
+        alert('Сақланди!');
         this.$router.push({ path: '/tolov' });
-        alert('Тўлов муваффақиятли сақланди!');
-      } catch (error) {
-        console.error("Xato:", error);
-        alert("Тўловни сақлашда хатолик юз берди.");
+      } catch (err) {
+        alert('Сақлашда хатолик юз берди');
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
+
 
 
 <style scoped>

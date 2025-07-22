@@ -1550,40 +1550,59 @@ export default defineComponent({
     };
 
     const changePrice = (index) => {
-      if (!changedisabled.value) {
-        const item = formData.prixod_table[index];
-        const originalCount = parseFloat(item.count) || 0;
-        console.log(`changePrice [${index}]: kontragent_price=${item.kontragent_price}, count=${item.count}, pack_norma=${item.pack_norma}, prev_kontragent_summa=${item.kontragent_summa}`);
-        item.kontragent_price = roundNumber(item.kontragent_price);
-        item.pack_price = item.pack_norma ? roundNumber(item.kontragent_price * item.pack_norma) : item.pack_price;
-        item.debit_price = item.kontragent_price;
-        item.count = originalCount;
-        item.kontragent_summa = roundNumber(item.kontragent_price * item.count);
-        item.debit_summa = roundNumber(item.debit_price * item.count);
-        item.chakana_summa = roundNumber((parseFloat(item.chakana_price) || 0) * item.count);
-        item.optom_summa = roundNumber((parseFloat(item.optom_price) || 0) * item.count);
-        console.log(`After changePrice [${index}]: kontragent_price=${item.kontragent_price}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
-        summa();
-      }
-    };
+  if (!changedisabled.value) {
+    const item = formData.prixod_table[index];
+    const originalCount = parseFloat(item.count) || 0;
+    console.log(`changePrice [${index}]: kontragent_price=${item.kontragent_price}, count=${item.count}, pack_norma=${item.pack_norma}, prev_kontragent_summa=${item.kontragent_summa}`);
+    item.kontragent_price = roundNumber(item.kontragent_price);
+    item.pack_price = item.pack_norma ? roundNumber(item.kontragent_price * item.pack_norma) : item.pack_price;
+    item.debit_price = item.kontragent_price;
+    item.count = originalCount;
+    item.kontragent_summa = roundNumber(item.kontragent_price * item.count);
+    item.debit_summa = roundNumber(item.debit_price * item.count);
+    item.chakana_summa = roundNumber((parseFloat(item.chakana_price) || 0) * item.count);
+    item.optom_summa = roundNumber((parseFloat(item.optom_price) || 0) * item.count);
+    console.log(`After changePrice [${index}]: kontragent_price=${item.kontragent_price}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
+    
+    // Trigger percentage updates if relevant prices exist
+    if (item.optom_price > 0 || item.optom_dollar_price > 0) {
+      changePriceOptom(index)
+    }
+    if (item.chakana_price > 0 || item.chakana_dollar_price > 0) {
+      changePriceChakana(index);
+    }
+    
+    summa();
+  }
+};
 
-    const changePackPrice = (index) => {
-      if (!changedisabled.value) {
-        const item = formData.prixod_table[index];
-        const originalCount = parseFloat(item.count) || 0;
-        console.log(`changePackPrice [${index}]: pack_price=${item.pack_price}, pack_norma=${item.pack_norma}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
-        item.pack_price = roundNumber(item.pack_price);
-        item.kontragent_price = item.pack_norma > 0 ? roundNumber(item.pack_price / item.pack_norma) : roundNumber(item.kontragent_price);
-        item.debit_price = item.kontragent_price;
-        item.count = originalCount;
-        item.kontragent_summa = roundNumber(item.kontragent_price * item.count);
-        item.debit_summa = roundNumber(item.debit_price * item.count);
-        item.chakana_summa = roundNumber((parseFloat(item.chakana_price) || 0) * item.count);
-        item.optom_summa = roundNumber((parseFloat(item.optom_price) || 0) * item.count);
-        console.log(`After changePackPrice [${index}]: kontragent_price=${item.kontragent_price}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
-        summa();
-      }
-    };
+   const changePackPrice = (index) => {
+  if (!changedisabled.value) {
+    const item = formData.prixod_table[index];
+    const originalCount = parseFloat(item.count) || 0;
+    console.log(`changePackPrice [${index}]: pack_price=${item.pack_price}, pack_norma=${item.pack_norma}, count=${item.count}, prev_kontragent_summa=${item.kontragent_summa}`);
+    item.pack_price = roundNumber(item.pack_price);
+    item.kontragent_price = item.pack_norma > 0 ? roundNumber(item.pack_price / item.pack_norma) : roundNumber(item.kontragent_price);
+    item.debit_price = item.kontragent_price;
+    item.count = originalCount;
+    item.kontragent_summa = roundNumber(item.kontragent_price * item.count);
+    item.debit_summa = roundNumber(item.debit_price * item.count);
+    item.chakana_summa = roundNumber((parseFloat(item.chakana_price) || 0) * item.count);
+    item.optom_summa = roundNumber((parseFloat(item.optom_price) || 0) * item.count);
+    console.log(`After changePackPrice [${index}]: kontragent_price=${item.kontragent_price}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
+    
+    // Trigger percentage updates if relevant prices exist
+    if (item.optom_price > 0 || item.optom_dollar_price > 0) {
+     changePriceOptom(index)
+    }
+    if (item.chakana_price > 0 || item.chakana_dollar_price > 0) {
+      changePriceChakana(index);
+      console.log('ishaldi');
+    }
+    
+    summa();
+  }
+};
 
     const changeCount = (index) => {
       if (!changedisabled.value) {
@@ -1661,7 +1680,7 @@ export default defineComponent({
         console.log(`After changePercentChakana [${index}]: chakana_price=${item.chakana_price}, chakana_summa=${item.chakana_summa}, count=${item.count}, kontragent_summa=${item.kontragent_summa}`);
         summa();
       }
-    };
+    };  
 
     const changePriceChakana = (index) => {
       if (!changedisabled.value) {
